@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grand Palace Hotel — Voice Assistant</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0f1535;
+      color: #e8effe;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      background: #1e2761;
+      border-bottom: 3px solid #f5c842;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header h1 { font-size: 20px; font-weight: 700; color: #f5c842; }
+    header p  { font-size: 13px; color: #cadcfc; margin-top: 2px; }
+    .container {
+      width: 100%;
+      max-width: 760px;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .chat-window {
+      background: #1a2152;
+      border: 1px solid #2a3575;
+      border-radius: 16px;
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message {
+      max-width: 82%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 15px;
+      line-height: 1.5;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .message.bot {
+      background: #1e2761;
+      border: 1px solid #2a3575;
+      border-left: 3px solid #f5c842;
+      align-self: flex-start;
+    }
+    .message.user {
+      background: #00b4d8;
+      align-self: flex-end;
+      color: #042c53;
+      font-weight: 500;
+    }
+    .message.system {
+      background: transparent;
+      border: 1px dashed #2a3575;
+      align-self: center;
+      color: #6b7a9f;
+      font-size: 13px;
+      font-style: italic;
+      max-width: 100%;
+      text-align: center;
+    }
+    .transcript-bar {
+      background: #131a45;
+      border: 1px solid #2a3575;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #6b7a9f;
+      min-height: 38px;
+    }
+    .transcript-bar.active { color: #00b4d8; }
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .text-input {
+      flex: 1;
+      background: #1a2152;
+      border: 1px solid #2a3575;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 15px;
+      color: #e8effe;
+      outline: none;
+    }
+    .text-input:focus { border-color: #00b4d8; }
+    .text-input::placeholder { color: #4a5a7a; }
+    button {
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 20px;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.85; }
+    #mic-btn {
+      background: #1e2761;
+      border: 2px solid #00b4d8;
+      color: #00b4d8;
+      font-size: 20px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    #mic-btn.recording {
+      background: #e24b4a;
+      border-color: #e24b4a;
+      color: white;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+    #send-btn { background: #f5c842; color: #1a1f3c; }
+    #reset-btn { background: transparent; border: 1px solid #2a3575; color: #6b7a9f; padding: 12px 14px; font-size: 13px; }
+    .status { text-align: center; font-size: 13px; color: #6b7a9f; padding: 4px; }
+    .status.thinking { color: #f5c842; }
+    .status.speaking { color: #2dc653; }
+    .status.error    { color: #e24b4a; }
+    .mode-tabs { display: flex; gap: 8px; background: #131a45; border-radius: 10px; padding: 6px; }
+    .tab { flex: 1; text-align: center; padding: 8px; border-radius: 7px; font-size: 13px; cursor: pointer; color: #6b7a9f; transition: background 0.2s, color 0.2s; user-select: none; }
+    .tab.active { background: #1e2761; color: #f5c842; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="font-size:28px">🏨</div>
+  <div>
+    <h1>Grand Palace Hotel</h1>
+    <p>AI Voice Assistant — Ask anything about our hotel</p>
+  </div>
+</header>
+
+<div class="container">
+  <div class="mode-tabs">
+    <div class="tab active" id="tab-voice" onclick="setMode('voice')">🎙 Voice Mode</div>
+    <div class="tab" id="tab-text" onclick="setMode('text')">⌨️ Text Mode</div>
+  </div>
+
+  <div class="chat-window" id="chat">
+    <div class="message bot">
+      Welcome to Grand Palace Hotel! I am your AI assistant. Ask me about rooms, food, amenities, timings, Wi-Fi, parking, and more. How can I help you today?
+    </div>
+  </div>
+
+  <div class="transcript-bar" id="transcript">Your speech will appear here...</div>
+
+  <div class="controls">
+    <button id="mic-btn" onclick="toggleRecording()" title="Click to start recording">🎙</button>
+    <input type="text" class="text-input" id="text-input"
+           placeholder="Type your question here..."
+           onkeydown="if(event.key==='Enter') sendText()"/>
+    <button id="send-btn" onclick="sendText()">Send</button>
+    <button id="reset-btn" onclick="resetChat()">Reset</button>
+  </div>
+
+  <div class="status" id="status">Ready — speak or type your question</div>
+</div>
+
+<script>
+  let mediaRecorder = null;
+  let audioChunks   = [];
+  let isRecording   = false;
+  let mode          = "voice";
+
+  function setMode(m) {
+    mode = m;
+    document.getElementById("tab-voice").classList.toggle("active", m==="voice");
+    document.getElementById("tab-text").classList.toggle("active", m==="text");
+    document.getElementById("mic-btn").style.display  = m==="voice" ? "flex" : "none";
+    document.getElementById("transcript").style.display = m==="voice" ? "block" : "none";
+  }
+
+  function addMessage(text, type) {
+    const chat = document.getElementById("chat");
+    const div  = document.createElement("div");
+    div.className = "message " + type;
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function setStatus(text, cls="") {
+    const s = document.getElementById("status");
+    s.textContent = text;
+    s.className = "status " + cls;
+  }
+
+  // ── Play audio (WAV bytes from server) ───────────────────────
+  function playAudioBytes(b64) {
+    try {
+      const bytes   = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+      const blob    = new Blob([bytes], { type: "audio/wav" });
+      const url     = URL.createObjectURL(blob);
+      const audio   = new Audio(url);
+      audio.volume  = 1.0;
+      setStatus("Speaking...", "speaking");
+      audio.play().then(() => {
+        audio.onended = () => {
+          setStatus("Ready — speak or type your question");
+          URL.revokeObjectURL(url);
+        };
+      }).catch(() => {
+        // Autoplay blocked — show click prompt
+        setStatus("Click anywhere on the page to hear the reply", "thinking");
+        const handler = () => {
+          audio.play();
+          document.removeEventListener("click", handler);
+        };
+        document.addEventListener("click", handler);
+      });
+    } catch(e) {
+      console.error("playAudioBytes:", e);
+      setStatus("Ready");
+    }
+  }
+
+  // ── Text mode ────────────────────────────────────────────────
+  async function sendText() {
+    const input = document.getElementById("text-input");
+    const text  = input.value.trim();
+    if (!text) return;
+    addMessage(text, "user");
+    input.value = "";
+    setStatus("Thinking...", "thinking");
+    try {
+      const res  = await fetch("/ask/text", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({text})
+      });
+      const data = await res.json();
+      addMessage(data.reply, "bot");
+      if (data.audio) playAudioBytes(data.audio);
+      else setStatus("Ready");
+    } catch(e) {
+      setStatus("Error connecting to server.", "error");
+    }
+  }
+
+  // ── Voice mode ───────────────────────────────────────────────
+  async function toggleRecording() {
+    if (!isRecording) { await startRecording(); }
+    else { stopRecording(); }
+  }
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+      audioChunks  = [];
+
+      // Use webm/opus — most browsers support this
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+                       ? "audio/webm;codecs=opus"
+                       : "audio/webm";
+
+      mediaRecorder = new MediaRecorder(stream, {mimeType});
+      mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
+      mediaRecorder.onstop = sendVoice;
+      mediaRecorder.start(100); // collect chunks every 100ms
+
+      isRecording = true;
+      document.getElementById("mic-btn").classList.add("recording");
+      document.getElementById("mic-btn").textContent = "⏹";
+      document.getElementById("transcript").textContent = "Listening... press stop when done.";
+      document.getElementById("transcript").classList.add("active");
+      setStatus("Recording — press the button again to stop");
+    } catch(e) {
+      setStatus("Microphone access denied. Please allow microphone in browser.", "error");
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+      mediaRecorder.stream.getTracks().forEach(t => t.stop());
+    }
+    isRecording = false;
+    document.getElementById("mic-btn").classList.remove("recording");
+    document.getElementById("mic-btn").textContent = "🎙";
+    setStatus("Processing your voice...", "thinking");
+  }
+
+  async function sendVoice() {
+    if (!audioChunks.length) { setStatus("No audio recorded. Try again."); return; }
+
+    const blob        = new Blob(audioChunks, {type: "audio/webm"});
+    const arrayBuffer = await blob.arrayBuffer();
+    const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+
+    try {
+      const res  = await fetch("/ask/voice", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({audio: base64Audio})
+      });
+      const data = await res.json();
+
+      if (data.transcript && data.transcript !== "no speech") {
+        document.getElementById("transcript").textContent = "You said: " + data.transcript;
+        document.getElementById("transcript").classList.remove("active");
+        addMessage(data.transcript, "user");
+      }
+
+      addMessage(data.reply, "bot");
+
+      if (data.audio) { playAudioBytes(data.audio); }
+      else { setStatus("Ready — speak or type your question"); }
+
+    } catch(e) {
+      setStatus("Error processing voice. Try again.", "error");
+    }
+  }
+
+  // ── Reset ────────────────────────────────────────────────────
+  async function resetChat() {
+    await fetch("/reset", {method:"POST"});
+    document.getElementById("chat").innerHTML =
+      '<div class="message system">Conversation reset. How can I help you?</div>';
+    document.getElementById("transcript").textContent = "Your speech will appear here...";
+    setStatus("Ready");
+  }
+
+  setMode("voice");
+</script>
+</body>
+</html>
