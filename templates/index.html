@@ -133,7 +133,7 @@
       animation: pulse 1s infinite;
     }
     @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-    #send-btn { background: #f5c842; color: #1a1f3c; }
+    #send-btn  { background: #f5c842; color: #1a1f3c; }
     #reset-btn { background: transparent; border: 1px solid #2a3575; color: #6b7a9f; padding: 12px 14px; font-size: 13px; }
     .status { text-align: center; font-size: 13px; color: #6b7a9f; padding: 4px; }
     .status.thinking { color: #f5c842; }
@@ -181,168 +181,150 @@
 </div>
 
 <script>
-  let mediaRecorder = null;
-  let audioChunks   = [];
-  let isRecording   = false;
-  let mode          = "voice";
+  let isRecording = false;
+  let recognition = null;
+  let mode        = "voice";
 
+  // ── Helpers ──────────────────────────────────────────────────
   function setMode(m) {
     mode = m;
-    document.getElementById("tab-voice").classList.toggle("active", m==="voice");
-    document.getElementById("tab-text").classList.toggle("active", m==="text");
-    document.getElementById("mic-btn").style.display  = m==="voice" ? "flex" : "none";
-    document.getElementById("transcript").style.display = m==="voice" ? "block" : "none";
+    document.getElementById("tab-voice").classList.toggle("active", m === "voice");
+    document.getElementById("tab-text").classList.toggle("active", m === "text");
+    document.getElementById("mic-btn").style.display     = m === "voice" ? "flex"  : "none";
+    document.getElementById("transcript").style.display  = m === "voice" ? "block" : "none";
   }
 
   function addMessage(text, type) {
     const chat = document.getElementById("chat");
     const div  = document.createElement("div");
-    div.className = "message " + type;
+    div.className   = "message " + type;
     div.textContent = text;
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
   }
 
-  function setStatus(text, cls="") {
+  function setStatus(text, cls = "") {
     const s = document.getElementById("status");
     s.textContent = text;
-    s.className = "status " + cls;
+    s.className   = "status " + cls;
   }
 
-  // ── Play audio (WAV bytes from server) ───────────────────────
-  function playAudioBytes(b64) {
+  // ── Browser TTS (replaces pyttsx3 server audio) ───────────────
+  function speakInBrowser(text) {
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "en-US";
+    utter.rate = 1.0;
+    // Use a female voice if available
+    const voices    = synth.getVoices();
+    const preferred = voices.find(v =>
+      v.name.includes("Female") || v.name.includes("Google UK English Female")
+    );
+    if (preferred) utter.voice = preferred;
+    setStatus("Speaking...", "speaking");
+    utter.onend = () => setStatus("Ready — speak or type your question");
+    synth.speak(utter);
+  }
+
+  // ── Shared fetch helper ───────────────────────────────────────
+  async function askServer(text) {
+    setStatus("Thinking...", "thinking");
     try {
-      const bytes   = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-      const blob    = new Blob([bytes], { type: "audio/wav" });
-      const url     = URL.createObjectURL(blob);
-      const audio   = new Audio(url);
-      audio.volume  = 1.0;
-      setStatus("Speaking...", "speaking");
-      audio.play().then(() => {
-        audio.onended = () => {
-          setStatus("Ready — speak or type your question");
-          URL.revokeObjectURL(url);
-        };
-      }).catch(() => {
-        // Autoplay blocked — show click prompt
-        setStatus("Click anywhere on the page to hear the reply", "thinking");
-        const handler = () => {
-          audio.play();
-          document.removeEventListener("click", handler);
-        };
-        document.addEventListener("click", handler);
+      const res  = await fetch("/ask/text", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ text })
       });
-    } catch(e) {
-      console.error("playAudioBytes:", e);
-      setStatus("Ready");
+      const data = await res.json();
+      addMessage(data.reply, "bot");
+      speakInBrowser(data.reply);
+    } catch (e) {
+      setStatus("Error connecting to server.", "error");
     }
   }
 
-  // ── Text mode ────────────────────────────────────────────────
+  // ── Text mode ─────────────────────────────────────────────────
   async function sendText() {
     const input = document.getElementById("text-input");
     const text  = input.value.trim();
     if (!text) return;
     addMessage(text, "user");
     input.value = "";
-    setStatus("Thinking...", "thinking");
-    try {
-      const res  = await fetch("/ask/text", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({text})
-      });
-      const data = await res.json();
-      addMessage(data.reply, "bot");
-      if (data.audio) playAudioBytes(data.audio);
-      else setStatus("Ready");
-    } catch(e) {
-      setStatus("Error connecting to server.", "error");
-    }
+    await askServer(text);
   }
 
-  // ── Voice mode ───────────────────────────────────────────────
+  // ── Voice mode (browser Web Speech API) ──────────────────────
   async function toggleRecording() {
-    if (!isRecording) { await startRecording(); }
-    else { stopRecording(); }
+    if (!isRecording) {
+      await startRecording();
+    } else {
+      stopRecording();
+    }
   }
 
   async function startRecording() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({audio: true});
-      audioChunks  = [];
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setStatus("Browser doesn't support voice. Use text mode.", "error");
+      return;
+    }
 
-      // Use webm/opus — most browsers support this
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-                       ? "audio/webm;codecs=opus"
-                       : "audio/webm";
+    recognition                  = new SpeechRecognition();
+    recognition.lang             = "en-US";
+    recognition.interimResults   = false;
+    recognition.continuous       = false;
 
-      mediaRecorder = new MediaRecorder(stream, {mimeType});
-      mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
-      mediaRecorder.onstop = sendVoice;
-      mediaRecorder.start(100); // collect chunks every 100ms
-
+    recognition.onstart = () => {
       isRecording = true;
       document.getElementById("mic-btn").classList.add("recording");
-      document.getElementById("mic-btn").textContent = "⏹";
-      document.getElementById("transcript").textContent = "Listening... press stop when done.";
+      document.getElementById("mic-btn").textContent  = "⏹";
+      document.getElementById("transcript").textContent = "Listening...";
       document.getElementById("transcript").classList.add("active");
-      setStatus("Recording — press the button again to stop");
-    } catch(e) {
-      setStatus("Microphone access denied. Please allow microphone in browser.", "error");
-    }
+      setStatus("Listening — speak now");
+    };
+
+    recognition.onresult = async (event) => {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById("transcript").textContent = "You said: " + transcript;
+      document.getElementById("transcript").classList.remove("active");
+      addMessage(transcript, "user");
+      stopRecording();
+      await askServer(transcript);
+    };
+
+    recognition.onerror = (e) => {
+      setStatus("Mic error: " + e.error, "error");
+      stopRecording();
+    };
+
+    recognition.onend = () => {
+      // If ended without a result (e.g. silence), reset UI
+      if (isRecording) stopRecording();
+    };
+
+    recognition.start();
   }
 
   function stopRecording() {
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-      mediaRecorder.stream.getTracks().forEach(t => t.stop());
-    }
+    if (recognition) recognition.stop();
     isRecording = false;
     document.getElementById("mic-btn").classList.remove("recording");
     document.getElementById("mic-btn").textContent = "🎙";
-    setStatus("Processing your voice...", "thinking");
   }
 
-  async function sendVoice() {
-    if (!audioChunks.length) { setStatus("No audio recorded. Try again."); return; }
-
-    const blob        = new Blob(audioChunks, {type: "audio/webm"});
-    const arrayBuffer = await blob.arrayBuffer();
-    const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-
-    try {
-      const res  = await fetch("/ask/voice", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({audio: base64Audio})
-      });
-      const data = await res.json();
-
-      if (data.transcript && data.transcript !== "no speech") {
-        document.getElementById("transcript").textContent = "You said: " + data.transcript;
-        document.getElementById("transcript").classList.remove("active");
-        addMessage(data.transcript, "user");
-      }
-
-      addMessage(data.reply, "bot");
-
-      if (data.audio) { playAudioBytes(data.audio); }
-      else { setStatus("Ready — speak or type your question"); }
-
-    } catch(e) {
-      setStatus("Error processing voice. Try again.", "error");
-    }
-  }
-
-  // ── Reset ────────────────────────────────────────────────────
+  // ── Reset ─────────────────────────────────────────────────────
   async function resetChat() {
-    await fetch("/reset", {method:"POST"});
+    await fetch("/reset", { method: "POST" });
     document.getElementById("chat").innerHTML =
       '<div class="message system">Conversation reset. How can I help you?</div>';
     document.getElementById("transcript").textContent = "Your speech will appear here...";
+    window.speechSynthesis.cancel();
     setStatus("Ready");
   }
+
+  // Preload voices (Chrome loads them async)
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 
   setMode("voice");
 </script>

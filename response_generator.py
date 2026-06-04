@@ -38,6 +38,14 @@ STRICT RULES — FOLLOW EXACTLY:
 11. Never use bullet points or markdown formatting.
 12. For dinner/lunch questions: check if the hotel restaurant serves those meals
     from the context before answering.
+13. Match your reply to the EXACT intent of the question:
+    - Guest says "I want to book / make a reservation / reserve a room"
+      → ONLY say: "We'd love to host you! To complete your booking, please 
+      call our front desk or visit wandrhotels.com. Can I help you with 
+      anything else?" Do NOT mention room types, prices, or amenities.
+    - Guest asks "What rooms do you have?" → briefly list room types only
+    - Guest asks "What is the price?" → give pricing only
+    Never volunteer information the guest did not ask for.
 
 HOTEL CONTEXT:
 {context}
@@ -54,6 +62,18 @@ HALLUCINATION_TRIGGERS = [
     "i'll process", "i will process"
 ]
 
+# ── Intent shortcuts (skip ChromaDB for known intents) ────────
+BOOKING_TRIGGERS = [
+    "book a room", "make a reservation", "reserve a room",
+    "want to book", "i want to stay", "how do i book",
+    "can i book", "booking"
+]
+
+BOOKING_REPLY = (
+    "We'd love to host you at Wandr Indiranagar! To complete your booking, "
+    "please call our front desk or visit wandrhotels.com. "
+    "Can I help you with anything else?"
+)
 
 def get_ai_response(user_text: str) -> str:
     """
@@ -62,9 +82,15 @@ def get_ai_response(user_text: str) -> str:
     """
     global chat_history
 
+    # ── Shortcut: booking intent ──────────────────────────────
+    if any(trigger in user_text.lower() for trigger in BOOKING_TRIGGERS):
+        chat_history.append({"role": "user", "content": user_text})
+        chat_history.append({"role": "assistant", "content": BOOKING_REPLY})
+        return BOOKING_REPLY
+
     try:
         # Step 1: Semantic search on ChromaDB
-        context = get_relevant_context(user_text, top_k=6)
+        context = get_relevant_context(user_text, top_k=3)
         print(f"[KB] Context length: {len(context)} chars")
 
         # Step 2: Build conversation history
@@ -88,7 +114,7 @@ def get_ai_response(user_text: str) -> str:
                 {"role": "system", "content": system},
                 {"role": "user",   "content": user_text}
             ],
-            max_tokens=150,
+            max_tokens=100,
             temperature=0.1,   # Very low = minimal hallucination
             top_p=0.8
         )

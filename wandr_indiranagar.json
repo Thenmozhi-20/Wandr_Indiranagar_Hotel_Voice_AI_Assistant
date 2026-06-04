@@ -756,6 +756,236 @@
       "email": "Not available — please check wandrhotels.com",
       "website": "wandrhotels.com",
       "address_full": "3363 No. 3363, 2nd cross road, HAL 2nd stage, Indiranagar, Bangalore - 560038, Karnataka, India"
+    },
+    "property_master": 
+    {
+      "property_type": "Boutique Hotel",
+      "year_opened": 2025,
+      "last_renovated": 2025,
+      "number_of_floors": 2,
+      "total_rooms": 18,
+      "geo_coordinates": {
+        "latitude": 12.9734,
+        "longitude": 77.6412
+      },
+      "google_maps_url": "https://maps.app.goo.gl/MhG3LfojHpw1Hyj1A?g_st=aw",
+      "landmarks": [
+        "Indiranagar 100 Feet Road",
+        "Indiranagar Metro Station",
+        "Indiranagar Methodist Church",
+        "Toit Brewery"
+      ],
+      "power_backup": true,
+      "ev_charging": false,
+      "valet_parking": false
+    },
+    "location_intelligence": {
+      "nearest_hospital": [
+        "Axon Speciality Hospital (6th Main Road)",
+        "Chinmaya Mission Hospital (CMH Road)",
+        "Manipal Hospital (Old Airport Road)",
+        "Lohitha Hospital (16th E Main Road)"
+      ],
+      "nearest_pharmacy": [
+      "S.S Medicals (12th Main Road)",
+      "Apollo Pharmacy (18th Main Road)",
+      "Revive Pharma 24/7 (Paramahansa Yogananda Road)",
+      "Prakash Medicals (80 Feet Road)"
+      ],
+      "nearest_atm": [
+        "HDFC Bank ATM (100 Feet Road)",
+        "ICICI Bank ATM (12th Main Road)",
+        "State Bank of India ATM (CMH Road)",
+        "Axis Bank ATM (HAL 2nd Stage)"
+      ],
+      "nearest_grocery_store": [
+        "Ratnadeep Supermarket (12th Main Road)",
+        "Simpli Namdhari's (7th Cross Road)",
+        "MK Retail Supermarket (CMH Road)",
+        "Organic Mandya (9th A Main Road)"
+      ],
+      "nearest_petrol_bunk": [
+        "Indian Oil Corporation Junction (Old Airport Rd)",
+        "HP Fuel Station (Indiranagar 100 Feet Rd)",
+        "Bharat Petroleum (Domlur Flyover Lounge)",
+        "Shell Fuel Station (Old Madras Road)"
+      ],
+      "nearest_police_station": [
+        "Indiranagar Traffic Police Station",
+        "Indiranagar Law & Order Police Station",
+        "Jeevan Bima Nagar Police Station",
+        "Domlur Police Outpost"
+      ],
+      "safe_at_night": [
+        "Highly secure due to active nightlife",
+        "Regular police patrol vehicles passing by",
+        "Bright streetlights across commercial roads",
+        "Active street crowd presence until midnight"
+      ],
+      "noise_level": [
+        "Low inside individual hotel rooms",
+        "Medium on secondary neighborhood roads",
+        "High near main party pubs on weekends",
+        "Low during standard morning hours"
+      ],
+      "cab_accessibility": [
+        "Immediate Uber and Ola driver matching",
+        "Rapido bike taxi pickups under two minutes",
+        "Namma Yatri auto rickshaws easily available",
+        "Ample space for roadside vehicle boarding"
+      ],
+      "traffic_level": [
+        "Low during early morning hours",
+        "Moderate during standard afternoon hours",
+        "High during corporate peak office checkout times",
+        "Heavy congestion near 100 Feet Road intersections"
+      ],
+      "railway_station_distance_km": [
+        "7.8 km to KSR Bengaluru City Station",
+        "6.2 km to Cantonment Railway Station",
+        "5.5 km to Krishnarajapuram Railway Station",
+        "11.5 km to Yesvantpur Junction Station"
+      ],
+      "airport_travel_time_minutes": [
+        "65 minutes using a standard taxi route",
+        "50 minutes during early morning hours",
+        "90 minutes during heavy evening traffic blocks",
+        "75 minutes riding the KIA-76 Volvo airport bus"
+      ]
+    },
+    "room_specs": {
+      "room_size_sqft": {
+        "deluxe_twin_room": 205,
+        "deluxe_queen_room": 215,
+        "deluxe_double_room": 237,
+        "queen_room_with_balcony": 258,
+        "twin_room_with_balcony": 258
+      },
+      "bed_dimensions": {
+        "queen_bed": "60 x 78 inches",
+        "single_bed": "36 x 75 inches"
+      },
+      "mattress_type": "Hypoallergenic Bedding",
+      "hot_water_availability": "24-hour hot & cold water",
+      "blackout_curtains": true,
+      "charging_ports_per_room": "Multiple bedside and desk sockets",
+      "workspace_friendly": true,
+      "smart_tv": true
+    },
+    "digital_experience": {
+      "mobile_check_in": true,
+      "digital_check_out": true,
+      "online_kyc": true,
+      "whatsapp_concierge": true,
+      "digital_room_key": null,
+      "qr_room_service": true,
+      "wifi_speed_mbps": 100,
+      "backup_internet_provider": "Airtel Fiber"
+    },
+    "food_and_dining_details": {
+      "breakfast_timings": "08:00 AM - 10:30 AM",
+      "breakfast_type": "South Indian Veg & Non-Veg (Sourced outside/Buffet/À la carte)",
+      "room_service_timings": "24 Hours",
+      "late_night_food_available": true,
+      "jain_food_available": null,
+      "vegan_food_available": null,
+      "gluten_free_options": null,
+      "kids_meals_available": null,
+      "complimentary_tea_coffee": true,
+      "outside_delivery_apps_allowed": true
+    },
+    "cleaning_hygiene": {
+      "room_cleaning_frequency": "Daily",
+      "linen_change_frequency": "On request / Alternate days",
+      "sanitization_process": "Standard hospitality deep cleaning protocol between guest stays",
+      "eco_friendly_toiletries": null,
+      "ro_drinking_water": true
+    },
+    "safety_emergency": {
+      "doctor_on_call": true,
+      "first_aid_kit_available": true,
+      "fire_exit_map_in_rooms": true,
+      "emergency_contact_process": "24/7 front desk helpline via WhatsApp and intercom",
+      "female_traveler_safety_rating": "Excellent"
+    },
+    "billing_details": {
+      "upi_accepted": true,
+      "security_deposit": null,
+      "refund_timeline_days": 7,
+      "split_payment_supported": true,
+      "corporate_billing_available": true,
+      "gst_breakdown": {
+        "cgst_percentage": 6.0,
+        "sgst_percentage": 6.0,
+        "total_gst_percentage": 12.0
+      }
+    },
+    "booking_operations": {
+      "walk_in_guests_allowed": true,
+      "tentative_booking_available": false,
+      "tentative_booking_hold_duration": null,
+      "booking_modification_policy": "Modifications allowed subject to rate differences and room availability per platform rules",
+      "no_show_policy": "Attracts full cost of the scheduled stay or full first-night penalty charge"
+    },
+    "guest_personalization": {
+      "loyalty_program": null,
+      "reward_points_supported": null,
+      "returning_guest_discount": null,
+      "room_upgrade_policy": "Subject to availability upon arrival, typically applicable during low-occupancy windows",
+      "saved_guest_preferences": null
+    },
+    "event_services": {
+      "birthday_decorations": "Allowed via third-party vendors (In-house staff setups not provided)",
+      "anniversary_setup": "Allowed via third-party vendors (In-house staff setups not provided)",
+      "honeymoon_setup": null,
+      "cake_arrangement": "Can be arranged externally via Swiggy/Zomato delivery apps",
+      "flower_bouquet_arrangement": null,
+      "private_dining": null,
+      "local_tours_arranged": null
+    },
+    "business_traveler_features": {
+      "printing_service": "Available at the front reception desk on request",
+      "scanning_service": "Available at the front reception desk on request",
+      "coworking_space": null,
+      "meeting_room_available": null,
+      "weekly_rates_available": "Subject to custom seasonal corporate quotes via team outreach",
+      "monthly_stay_discount": "Subject to custom seasonal corporate quotes via team outreach"
+    },
+    "ai_metadata": {
+      "faq_intents": [
+        "ask_total_floors",
+        "ask_property_type",
+        "ask_year_opened",
+        "ask_location_coordinates",
+        "ask_nearest_hospital",
+        "ask_wifi_speed",
+        "ask_outside_food_policy",
+        "ask_third_party_decoration"
+      ],
+      "search_keywords": [
+        "Wandr Indiranagar Bangalore",
+        "Boutique hotel near 100 Feet Road",
+        "Wandr Hotels Bengaluru booking",
+        "Budget corporate stay Indiranagar",
+        "Hotels near Indiranagar Metro Station",
+        "Wandr Indiranagar balcony rooms"
+      ],
+      "review_topics": [
+        "Room cleanliness and modern decor",
+        "Proximity to Indiranagar pubs and cafes",
+        "High-speed Wi-Fi performance for work",
+        "Helpful reception and front desk staff",
+        "Outside food delivery convenience",
+        "Quietness inside residential cross-lanes"
+      ],
+      "semantic_tags": [
+        "hospitality:hotel:boutique",
+        "geo:india:bengaluru:indiranagar",
+        "traveler:corporate:solo",
+        "amenity:workspace_friendly",
+        "policy:outside_food_allowed",
+        "infrastructure:low_rise"
+      ]
     }
   }
 }

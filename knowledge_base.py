@@ -29,12 +29,6 @@ print(f"[KB] Loaded hotel data: {HOTEL_DATA['name']}")
 # ── Initialize Chroma Collection ──────────────────────────────
 COLLECTION_NAME = "wandr_knowledge"
 
-try:
-    client.delete_collection(name=COLLECTION_NAME)
-    print("[Chroma] Cleared previous collection")
-except Exception:
-    pass
-
 collection = client.get_or_create_collection(
     name=COLLECTION_NAME,
     metadata={"hnsw:space": "cosine"}
@@ -260,10 +254,11 @@ def prepare_documents():
 
     # ── 19. Payment Methods (STRICTLY from JSON) ──────────────
     payment_methods = h.get("payment_methods", [])
+    upi = h.get("billing_details", {}).get("upi_accepted", False)
+
     docs_and_ids.append((
         f"Accepted payment methods: {', '.join(payment_methods)}. "
-        f"IMPORTANT: Only the above payment methods are accepted. "
-        f"UPI, GPay, PhonePe, Paytm, and net banking are NOT mentioned in hotel data.",
+        f"UPI accepted: {upi}.",
         "payment_methods"
     ))
 
@@ -354,24 +349,135 @@ def prepare_documents():
         "contact_details"
     ))
 
+    # ── 30. Property Master ─────────────────────────────
+    pm = h.get("property_master", {})
+    docs_and_ids.append((
+        f"Property type: {pm.get('property_type')}. "
+        f"Year opened: {pm.get('year_opened')}. "
+        f"Last renovated: {pm.get('last_renovated')}. "
+        f"Total rooms: {pm.get('total_rooms')}. "
+        f"Number of floors: {pm.get('number_of_floors')}. "
+        f"Power backup available: {pm.get('power_backup')}. "
+        f"EV charging available: {pm.get('ev_charging')}. "
+        f"Valet parking available: {pm.get('valet_parking')}.",
+        "property_master"
+    ))
+
+    # ── 31. Location Intelligence ──────────────────────
+    loc = h.get("location_intelligence", {})
+    docs_and_ids.append((
+        f"Nearest hospitals: {', '.join(loc.get('nearest_hospital', []))}. "
+        f"Nearest pharmacies: {', '.join(loc.get('nearest_pharmacy', []))}. "
+        f"Nearest ATMs: {', '.join(loc.get('nearest_atm', []))}. "
+        f"Nearest grocery stores: {', '.join(loc.get('nearest_grocery_store', []))}. "
+        f"Nearest petrol stations: {', '.join(loc.get('nearest_petrol_bunk', []))}.",
+        "location_intelligence"
+    ))
+
+    # ── 32. Room Specifications ────────────────────────
+    specs = h.get("room_specs", {})
+    docs_and_ids.append((
+        f"Room sizes: {specs.get('room_size_sqft')}. "
+        f"Bed dimensions: {specs.get('bed_dimensions')}. "
+        f"Mattress type: {specs.get('mattress_type')}. "
+        f"Hot water availability: {specs.get('hot_water_availability')}. "
+        f"Blackout curtains: {specs.get('blackout_curtains')}. "
+        f"Workspace friendly: {specs.get('workspace_friendly')}. "
+        f"Smart TV available: {specs.get('smart_tv')}.",
+        "room_specs"
+    ))
+
+    # ── 33. Digital Experience ─────────────────────────
+    dx = h.get("digital_experience", {})
+    docs_and_ids.append((
+        f"Mobile check-in: {dx.get('mobile_check_in')}. "
+        f"Digital check-out: {dx.get('digital_check_out')}. "
+        f"Online KYC: {dx.get('online_kyc')}. "
+        f"WhatsApp concierge: {dx.get('whatsapp_concierge')}. "
+        f"QR room service: {dx.get('qr_room_service')}. "
+        f"WiFi speed: {dx.get('wifi_speed_mbps')} Mbps. "
+        f"Backup internet provider: {dx.get('backup_internet_provider')}.",
+        "digital_experience"
+    ))
+
+    # ── 34. Food & Dining Details ──────────────────────
+    food = h.get("food_and_dining_details", {})
+    docs_and_ids.append((
+        f"Breakfast timings: {food.get('breakfast_timings')}. "
+        f"Breakfast type: {food.get('breakfast_type')}. "
+        f"Room service timings: {food.get('room_service_timings')}. "
+        f"Late night food available: {food.get('late_night_food_available')}. "
+        f"Complimentary tea and coffee: {food.get('complimentary_tea_coffee')}. "
+        f"Outside delivery apps allowed: {food.get('outside_delivery_apps_allowed')}.",
+        "food_dining_details"
+    ))
+
+    # ── 35. Cleaning & Hygiene ─────────────────────────
+    clean = h.get("cleaning_hygiene", {})
+    docs_and_ids.append((
+        f"Room cleaning frequency: {clean.get('room_cleaning_frequency')}. "
+        f"Linen change frequency: {clean.get('linen_change_frequency')}. "
+        f"Sanitization process: {clean.get('sanitization_process')}. "
+        f"RO drinking water available: {clean.get('ro_drinking_water')}.",
+        "cleaning_hygiene"
+    ))
+
+    # ── 36. Safety & Emergency ─────────────────────────
+    safe = h.get("safety_emergency", {})
+    docs_and_ids.append((
+        f"Doctor on call: {safe.get('doctor_on_call')}. "
+        f"First aid kit available: {safe.get('first_aid_kit_available')}. "
+        f"Fire exit map in rooms: {safe.get('fire_exit_map_in_rooms')}. "
+        f"Emergency contact process: {safe.get('emergency_contact_process')}. "
+        f"Female traveler safety rating: {safe.get('female_traveler_safety_rating')}.",
+        "safety_emergency"
+    ))
+
+    # ── 37. Billing Details ────────────────────────────
+    bill = h.get("billing_details", {})
+    gst = bill.get("gst_breakdown", {})
+    docs_and_ids.append((
+        f"UPI accepted: {bill.get('upi_accepted')}. "
+        f"Split payment supported: {bill.get('split_payment_supported')}. "
+        f"Corporate billing available: {bill.get('corporate_billing_available')}. "
+        f"Refund timeline: {bill.get('refund_timeline_days')} days. "
+        f"GST percentage: {gst.get('total_gst_percentage')}%.",
+        "billing_details"
+    ))
+
+    # ── 38. Booking Operations ─────────────────────────
+    booking = h.get("booking_operations", {})
+    docs_and_ids.append((
+        f"Walk-in guests allowed: {booking.get('walk_in_guests_allowed')}. "
+        f"Tentative booking available: {booking.get('tentative_booking_available')}. "
+        f"Booking modification policy: {booking.get('booking_modification_policy')}. "
+        f"No-show policy: {booking.get('no_show_policy')}.",
+        "booking_operations"
+    ))
+
+    # ── 39. Event Services ─────────────────────────────
+    event = h.get("event_services", {})
+    docs_and_ids.append((
+        f"Birthday decorations: {event.get('birthday_decorations')}. "
+        f"Anniversary setup: {event.get('anniversary_setup')}. "
+        f"Cake arrangement: {event.get('cake_arrangement')}.",
+        "event_services"
+    ))
+
+    # ── 40. Business Traveler Features ────────────────
+    biz = h.get("business_traveler_features", {})
+    docs_and_ids.append((
+        f"Printing service: {biz.get('printing_service')}. "
+        f"Scanning service: {biz.get('scanning_service')}. "
+        f"Weekly rates: {biz.get('weekly_rates_available')}. "
+        f"Monthly stay discount: {biz.get('monthly_stay_discount')}.",
+        "business_traveler_features"
+    ))
+
+
     documents = [d for d, _ in docs_and_ids if d]
     ids       = [i for _, i in docs_and_ids if i]
     return documents, ids
-
-
-# ── Index into ChromaDB ───────────────────────────────────────
-print("[Chroma] Indexing hotel knowledge base...")
-documents, ids = prepare_documents()
-
-if documents:
-    collection.add(
-        ids=ids,
-        documents=documents,
-        metadatas=[{"source": "wandr_indiranagar"} for _ in documents]
-    )
-    print(f"[Chroma] Indexed {len(documents)} documents successfully.")
-else:
-    print("[Chroma] Warning: No documents to index.")
 
 
 # ── Query Function ────────────────────────────────────────────
@@ -398,3 +504,23 @@ def get_relevant_context(query: str, top_k: int = 6) -> str:
     except Exception as e:
         print(f"[Chroma] Query error: {e}")
         return "Error retrieving information from knowledge base."
+
+# ── Index only if collection is empty (skip on subsequent startups) ──
+collection = client.get_or_create_collection(
+    name=COLLECTION_NAME,
+    metadata={"hnsw:space": "cosine"}
+)
+
+# Only index if empty
+if collection.count() == 0:
+    print("[Chroma] Indexing hotel knowledge base...")
+    documents, ids = prepare_documents()
+    if documents:
+        collection.add(
+            ids=ids,
+            documents=documents,
+            metadatas=[{"source": "wandr_indiranagar"} for _ in documents]
+        )
+        print(f"[Chroma] Indexed {len(documents)} documents successfully.")
+else:
+    print(f"[Chroma] Using cached index ({collection.count()} docs).")
