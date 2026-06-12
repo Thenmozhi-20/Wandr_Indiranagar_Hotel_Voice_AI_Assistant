@@ -1,15 +1,7 @@
-# ============================================================
-#  config.py  —  Configuration
-#  Put your API keys here.
-# ============================================================
+import os
+from dotenv import load_dotenv
 
-# Get your free Groq API key at: https://console.groq.com
-GROQ_API_KEY = "YOUR_GROQ_API_KEY"  # YOUR_GROQ_API_KEY
+load_dotenv()
 
-# Whisper model size: "tiny", "base", "small", "medium"
-# "base" is a good balance of speed and accuracy
-WHISPER_MODEL = "base"
-
-# Flask secret key (any random string is fine)
-FLASK_SECRET_KEY = "YOUR_FLASK_SECRET_KEY"  # YOUR_FLASK_SECRET_KEY
-
+GROQ_API_KEY     = os.environ.get("GROQ_API_KEY", "")
+FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "wandr-secret-key")
