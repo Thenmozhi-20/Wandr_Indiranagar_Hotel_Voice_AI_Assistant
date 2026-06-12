@@ -54,6 +54,12 @@ SYNONYMS = {
     "hospital": "nearby", "pharmacy": "nearby", "atm": "nearby",
     "bus stand": "location", "bus stop": "location", "railway": "transport",
     "station": "transport", "train": "transport",
+    "police": "nearby", "police station": "nearby",
+    "medical": "nearby", "medicals": "nearby", "pharmacist": "nearby",
+    "chemist": "nearby", "drug store": "nearby",
+    "mall": "nearby", "shopping": "nearby", "supermarket": "nearby",
+    "grocery": "nearby", "petrol": "nearby", "fuel": "nearby",
+    "first aid": "safety", "doctor": "safety", "emergency": "safety",
     "celebrate": "events", "birthday": "events", "anniversary": "events",
     "honeymoon": "events", "decoration": "events",
     "business": "business", "meeting": "business", "print": "business",
@@ -231,9 +237,11 @@ def _section_nearby() -> str:
     return (
         f"NEARBY PLACES:\n"
         f"Nearest hospitals: {', '.join(li.get('nearest_hospital', [])[:3])}\n"
-        f"Nearest pharmacy: {', '.join(li.get('nearest_pharmacy', [])[:2])}\n"
+        f"Nearest pharmacy/medicals: {', '.join(li.get('nearest_pharmacy', [])[:3])}\n"
         f"Nearest ATM: {', '.join(li.get('nearest_atm', [])[:2])}\n"
         f"Nearest grocery: {', '.join(li.get('nearest_grocery_store', [])[:2])}\n"
+        f"Nearest police station: {', '.join(li.get('nearest_police_station', [])[:2])}\n"
+        f"Nearest petrol bunk: {', '.join(li.get('nearest_petrol_bunk', [])[:2])}\n"
         f"Landmarks: {', '.join(_HOTEL['property_master'].get('landmarks', []))}\n"
         f"Nearby places: {', '.join(top)}"
     )
