@@ -1,601 +1,503 @@
 # ============================================================
-#  knowledge_base.py  —  ChromaDB Knowledge Base
-#  Uses ChromaDB semantic search on wandr_indiranagar.json
-#  Fixed:
-#    - Gym/pool explicitly indexed as NOT available
-#    - Restaurants pulled from correct field (area_info)
-#    - Payment methods strictly from JSON only
-#    - Nearby places NOT labeled as restaurants
+#  knowledge_base.py  —  Lightweight JSON-based retrieval
+#  No ChromaDB. No ONNX. No 400MB RAM overhead.
+#  Drop-in replacement: get_relevant_context() works the same.
 # ============================================================
 
 import json
 import os
-import chromadb
+import re
 
-# ── Initialize Chroma Client ──────────────────────────────────
-CHROMA_DB_PATH = os.path.join(os.path.dirname(__file__), "chroma_db")
-os.makedirs(CHROMA_DB_PATH, exist_ok=True)
+# ── Load JSON once at startup ─────────────────────────────────
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+_JSON_PATH = os.path.join(_BASE_DIR, "wandr_indiranagar.json")
 
-client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
+with open(_JSON_PATH, "r", encoding="utf-8") as f:
+    _HOTEL = json.load(f)["hotel"]
 
-# ── Load JSON data ────────────────────────────────────────────
-JSON_PATH = os.path.join(os.path.dirname(__file__), "wandr_indiranagar.json")
+print(f"[KB] Loaded hotel data: {_HOTEL['name']}")
 
-with open(JSON_PATH, "r", encoding="utf-8") as f:
-    HOTEL_DATA = json.load(f)["hotel"]
+# ── Synonym map — handles natural language variations ─────────
+SYNONYMS = {
+    # fitness
+    "gym": "fitness_center",
+    "workout": "fitness_center",
+    "exercise": "fitness_center",
+    "fitness": "fitness_center",
+    "work out": "fitness_center",
+    # pool
+    "pool": "swimming_pool",
+    "swim": "swimming_pool",
+    "swimming": "swimming_pool",
+    # wifi
+    "wifi": "internet",
+    "wi-fi": "internet",
+    "internet": "internet",
+    "broadband": "internet",
+    "wi fi": "internet",
+    # parking
+    "parking": "parking",
+    "car park": "parking",
+    "park my car": "parking",
+    "vehicle": "parking",
+    # food
+    "breakfast": "food",
+    "lunch": "food",
+    "dinner": "food",
+    "food": "food",
+    "restaurant": "food",
+    "eat": "food",
+    "meal": "food",
+    "dining": "food",
+    "room service": "food",
+    "menu": "food",
+    # checkin/checkout
+    "check in": "checkin",
+    "check-in": "checkin",
+    "checkin": "checkin",
+    "check out": "checkout",
+    "check-out": "checkout",
+    "checkout": "checkout",
+    "early check": "checkin",
+    "late check": "checkout",
+    # rooms
+    "room": "rooms",
+    "rooms": "rooms",
+    "suite": "rooms",
+    "accommodation": "rooms",
+    "bed": "rooms",
+    "balcony": "rooms",
+    # price
+    "price": "pricing",
+    "cost": "pricing",
+    "rate": "pricing",
+    "how much": "pricing",
+    "charges": "pricing",
+    "tariff": "pricing",
+    "fees": "pricing",
+    # location
+    "location": "location",
+    "address": "location",
+    "where": "location",
+    "directions": "location",
+    "metro": "location",
+    "airport": "location",
+    "how far": "location",
+    "distance": "location",
+    # nearby
+    "nearby": "nearby",
+    "around": "nearby",
+    "close to": "nearby",
+    "walking distance": "nearby",
+    "restaurants near": "nearby_restaurants",
+    "places to eat": "nearby_restaurants",
+    "where to eat": "nearby_restaurants",
+    # laundry
+    "laundry": "laundry",
+    "wash clothes": "laundry",
+    "dry cleaning": "laundry",
+    "ironing": "laundry",
+    # transport
+    "cab": "transport",
+    "taxi": "transport",
+    "uber": "transport",
+    "ola": "transport",
+    "shuttle": "transport",
+    "airport transfer": "transport",
+    "auto": "transport",
+    # safety
+    "safe": "safety",
+    "security": "safety",
+    "cctv": "safety",
+    "night": "safety",
+    # pets
+    "pet": "pets",
+    "dog": "pets",
+    "cat": "pets",
+    "animal": "pets",
+    # smoking
+    "smoke": "smoking",
+    "smoking": "smoking",
+    "cigarette": "smoking",
+    # payment
+    "payment": "billing",
+    "pay": "billing",
+    "card": "billing",
+    "cash": "billing",
+    "upi": "billing",
+    "gst": "billing",
+    "invoice": "billing",
+    "bill": "billing",
+    # accessibility
+    "wheelchair": "accessibility",
+    "disabled": "accessibility",
+    "accessible": "accessibility",
+    "elevator": "accessibility",
+    "lift": "accessibility",
+}
 
-print(f"[KB] Loaded hotel data: {HOTEL_DATA['name']}")
+# ── Section builders — each returns a text block ─────────────
 
-# ── Initialize Chroma Collection ──────────────────────────────
-COLLECTION_NAME = "wandr_knowledge"
+def _section_general() -> str:
+    h = _HOTEL
+    addr = h["address"]
+    r = h["ratings"]
+    return (
+        f"Hotel: {h['name']}\n"
+        f"Address: {addr['street']}, {addr['city']} - {addr['pincode']}\n"
+        f"Type: {h['property_master']['property_type']}\n"
+        f"Floors: {h['property_master']['number_of_floors']}, Total Rooms: {h['property_master']['total_rooms']}\n"
+        f"Rating: {r['overall_score']}/10 ({r['overall_label']}) based on {r['total_reviews']} reviews\n"
+        f"Location Score: {r['category_scores']['location']}/10\n"
+        f"Staff Score: {r['category_scores']['staff']}/10\n"
+        f"Couple Friendly: Yes\n"
+        f"Popular with Families: Yes\n"
+        f"Year Opened: {h['property_master']['year_opened']}\n"
+        f"Google Maps: {h['property_master']['google_maps_url']}\n"
+        f"Website: {h['contact']['website']}\n"
+        f"Languages Spoken: {', '.join(h['facilities']['languages_spoken'])}"
+    )
 
-collection = client.get_or_create_collection(
-    name=COLLECTION_NAME,
-    metadata={"hnsw:space": "cosine"}
-)
-
-
-# ── Prepare documents from JSON ───────────────────────────────
-def prepare_documents():
-    """
-    Extract all hotel information as documents for ChromaDB.
-    Every fact is explicit — no ambiguity for the LLM.
-    """
-    docs_and_ids = []
-    h = HOTEL_DATA
-
-    # ── 1. Hotel Basics ───────────────────────────────────────
-    docs_and_ids.append((
-        f"Hotel name: {h['name']}. "
-        f"Address: {h['address']['street']}, {h['address']['city']} - {h['address']['pincode']}. "
-        f"State: {h['address']['state']}, Country: {h['address']['country']}.",
-        "hotel_basics"
-    ))
-
-    # ── 2. Ratings ────────────────────────────────────────────
-    s = h["ratings"]["category_scores"]
-    docs_and_ids.append((
-        f"Overall rating: {h['ratings']['overall_score']}/10 ({h['ratings']['overall_label']}) "
-        f"based on {h['ratings']['total_reviews']} reviews. "
-        f"Staff: {s['staff']}/10. Facilities: {s['facilities']}/10. "
-        f"Cleanliness: {s['cleanliness']}/10. Comfort: {s['comfort']}/10. "
-        f"Value for money: {s['value_for_money']}/10. "
-        f"Location: {s['location']}/10. Free WiFi: {s['free_wifi']}/10. "
-        f"Couples rating: {h['ratings'].get('couples_rating', 'N/A')}/10.",
-        "hotel_ratings"
-    ))
-
-    # ── 3. Distance / Location ────────────────────────────────
-    docs_and_ids.append((
-        f"Distance from city center: {h['distance_from_city_center_km']} km. "
-        f"Distance from airport (Kempegowda International Airport): {h['distance_from_airport_km']} km. "
-        f"Location tag: {h.get('location_tag', 'Excellent location')}.",
-        "hotel_distance"
-    ))
-
-    # ── 4. Description ────────────────────────────────────────
-    desc = h.get("description", {})
-    docs_and_ids.append((
-        f"About the hotel: {desc.get('comfortable_accommodations', '')} "
-        f"{desc.get('essential_facilities', '')} "
-        f"{desc.get('dining_options', '')} "
-        f"{desc.get('local_attractions', '')} "
-        f"Popular with families: {desc.get('popular_with_families')}. "
-        f"Couple friendly: {desc.get('couple_friendly')}.",
-        "hotel_description"
-    ))
-
-    # ── 5. Rooms & Pricing ────────────────────────────────────
-    for room in h.get("rooms", []):
-        rtype  = room.get("room_type", "Room")
-        bed    = room.get("bed_type", "")
-        status = room.get("availability_status", "")
+def _section_rooms() -> str:
+    lines = ["ROOM TYPES & PRICING:"]
+    for room in _HOTEL["rooms"]:
+        pricing = room.get("pricing", {})
+        base = pricing.get("base_price_per_night_inr", "N/A")
         amenities = ", ".join(room.get("amenities", []))
-        pricing_parts = []
-        for plan in room.get("pricing", []):
-            pricing_parts.append(
-                f"{plan['plan']}: Rs.{plan['price_per_night_INR']}/night "
-                f"(original Rs.{plan['original_price_INR']}, "
-                f"discount Rs.{plan['discount_INR']}, {plan['price_note']})"
-            )
-        pricing_str = " | ".join(pricing_parts) if pricing_parts else "Sold out — no pricing available"
-        docs_and_ids.append((
-            f"Room type: {rtype}. Bed type: {bed}. "
-            f"Availability: {status}. "
-            f"Room amenities: {amenities}. "
-            f"Pricing: {pricing_str}.",
-            f"room_{rtype.lower().replace(' ', '_')}"
-        ))
-
-    # ── 6. Breakfast / Dining ─────────────────────────────────
-    bf = h.get("breakfast", {})
-    meal_periods = ", ".join(bf.get("meal_periods", []))
-    docs_and_ids.append((
-        f"Breakfast available: {bf.get('available')}. "
-        f"Breakfast options: {', '.join(bf.get('options', []))}. "
-        f"Breakfast includes: {', '.join(bf.get('includes', []))}. "
-        f"Meal periods served at hotel: {meal_periods}. "
-        f"On-site restaurant: {h['facilities'].get('restaurant_onsite')}. "
-        f"Restaurant serves: {h['facilities'].get('restaurant_note', 'breakfast, lunch and dinner')}. "
-        f"Breakfast guest review score: {bf.get('guest_review_score')}/10.",
-        "breakfast_dining"
-    ))
-
-    # ── 7. Nearby Restaurants (CORRECT field) ─────────────────
-    restaurants = h["area_info"].get("restaurants_and_cafes", [])
-    rest_list = ", ".join([
-        f"{r['name']} ({r['type']}) - {r.get('distance_m', '')}m away"
-        for r in restaurants
-    ])
-    docs_and_ids.append((
-        f"Nearby restaurants and cafes close to the hotel: {rest_list}. "
-        f"These are the only known nearby dining options from hotel data.",
-        "nearby_restaurants"
-    ))
-
-    # ── 8. Nearby Places (NOT restaurants) ────────────────────
-    nearby = h.get("nearby_places", [])
-    nearby_list = ", ".join([
-        f"{n['name']} - {n['distance_km']}km" for n in nearby
-    ])
-    docs_and_ids.append((
-        f"Nearby places and landmarks (these are NOT restaurants): {nearby_list}.",
-        "nearby_places"
-    ))
-
-    # ── 9. Top Attractions ────────────────────────────────────
-    attractions = h["area_info"].get("top_attractions", [])
-    attr_list = ", ".join([
-        f"{a['name']} - {a['distance_km']}km" for a in attractions
-    ])
-    docs_and_ids.append((
-        f"Top tourist attractions near the hotel: {attr_list}.",
-        "top_attractions"
-    ))
-
-    # ── 10. WiFi ──────────────────────────────────────────────
-    wifi = h["facilities"].get("internet", {})
-    docs_and_ids.append((
-        f"WiFi available: {wifi.get('wifi_available')}. "
-        f"WiFi coverage: {wifi.get('wifi_areas')}. "
-        f"WiFi cost: {wifi.get('wifi_cost')}.",
-        "wifi"
-    ))
-
-    # ── 11. Parking ───────────────────────────────────────────
-    parking = h["facilities"].get("parking", {})
-    docs_and_ids.append((
-        f"Parking available: {parking.get('available')}. "
-        f"Type: {parking.get('type')}. "
-        f"Reservation needed: {parking.get('reservation_needed')}. "
-        f"Capacity: {parking.get('capacity')}. "
-        f"Parking garage: {parking.get('parking_garage')}. "
-        f"Accessible parking: {parking.get('accessible_parking')}.",
-        "parking"
-    ))
-
-    # ── 12. Pool — EXPLICITLY NOT available ───────────────────
-    has_pool = h["facilities"].get("swimming_pool", False)
-    docs_and_ids.append((
-        f"Swimming pool: {'Available at the hotel.' if has_pool else 'NOT available. This hotel does NOT have a swimming pool.'}",
-        "swimming_pool"
-    ))
-
-    # ── 13. Gym — EXPLICITLY NOT available ────────────────────
-    has_gym = h["facilities"].get("fitness_center", False)
-    docs_and_ids.append((
-        f"Gym / Fitness center: {'Available at the hotel.' if has_gym else 'NOT available. This hotel does NOT have a gym or fitness center.'}",
-        "gym_fitness"
-    ))
-
-    # ── 14. Airport Shuttle ───────────────────────────────────
-    shuttle = h["facilities"].get("airport_shuttle", {})
-    docs_and_ids.append((
-        f"Airport shuttle: Available={shuttle.get('available')}. "
-        f"Additional charge applies: {shuttle.get('additional_charge')}. "
-        f"How to request: {shuttle.get('request')}.",
-        "airport_shuttle"
-    ))
-
-    # ── 15. Check-in / Check-out ──────────────────────────────
-    rules = h.get("house_rules", {})
-    ci = rules.get("check_in", {})
-    co = rules.get("check_out", {})
-    docs_and_ids.append((
-        f"Check-in from: {ci.get('from')} (1:00 PM). "
-        f"Check-out until: {co.get('until')} (11:00 AM). "
-        f"Early check-in: {ci.get('early_check_in')}. "
-        f"Late check-out: {co.get('late_check_out')}.",
-        "checkin_checkout"
-    ))
-
-    # ── 16. Policies ──────────────────────────────────────────
-    age   = rules.get("age_restriction", {})
-    pets  = rules.get("pets", {})
-    smoke = rules.get("smoking", {})
-    food  = rules.get("outside_food_beverage", {})
-    visit = rules.get("visitors", {})
-    party = rules.get("parties_events", {})
-    idr   = rules.get("id_requirements", {})
-    docs_and_ids.append((
-        f"Minimum check-in age: {age.get('minimum_check_in_age')}. "
-        f"Pets: {'Allowed' if pets.get('allowed') else 'NOT allowed'}. "
-        f"Smoking: {'Allowed' if smoke.get('allowed') else 'NOT allowed'} (designated area available). "
-        f"Outside food and beverages: {'Allowed' if food.get('allowed') else 'Not allowed'}. "
-        f"Visitors: {'Allowed' if visit.get('allowed') else 'Not allowed'}. "
-        f"Parties/events: {'Allowed' if party.get('allowed') else 'NOT allowed'}. "
-        f"Government ID required: {idr.get('government_id_required')}. "
-        f"Local ID accepted: {idr.get('local_id_allowed')}. "
-        f"Foreigners allowed: {idr.get('foreigners_allowed')}. "
-        f"Cancellation policy: {rules.get('cancellation_prepayment', 'Varies by room type')}.",
-        "house_policies"
-    ))
-
-    # ── 17. Couple Policy ─────────────────────────────────────
-    couple = rules.get("couples", {})
-    docs_and_ids.append((
-        f"Couple friendly: {couple.get('couple_friendly')}. "
-        f"Unmarried couples allowed: {couple.get('unmarried_couples_allowed')}. "
-        f"Valid ID cards required for all guests.",
-        "couple_policy"
-    ))
-
-    # ── 18. Children Policy ───────────────────────────────────
-    children = rules.get("children_policy", {})
-    extra_bed = children.get("extra_bed", {})
-    docs_and_ids.append((
-        f"Children welcome: {children.get('children_welcome')}. "
-        f"Children charged as adults from age: {children.get('children_charged_as_adults_age')}. "
-        f"Cribs available: {children.get('cribs_available')}. "
-        f"Extra bed: available on request at "
-        f"Rs.{extra_bed.get('price_per_person_per_night_INR', 1500)}/person/night.",
-        "children_policy"
-    ))
-
-    # ── 19. Payment Methods (STRICTLY from JSON) ──────────────
-    payment_methods = h.get("payment_methods", [])
-    upi = h.get("billing_details", {}).get("upi_accepted", False)
-
-    docs_and_ids.append((
-        f"Accepted payment methods: {', '.join(payment_methods)}. "
-        f"UPI accepted: {upi}.",
-        "payment_methods"
-    ))
-
-    # ── 20. Amenities ─────────────────────────────────────────
-    docs_and_ids.append((
-        f"Hotel amenities: {', '.join(h.get('amenities', []))}.",
-        "amenities"
-    ))
-
-    # ── 21. Safety & Security ─────────────────────────────────
-    security = h["facilities"].get("safety_and_security", [])
-    docs_and_ids.append((
-        f"Safety and security features: {', '.join(security)}.",
-        "security"
-    ))
-
-    # ── 22. Accessibility ─────────────────────────────────────
-    accessibility = h["facilities"].get("accessibility", [])
-    docs_and_ids.append((
-        f"Accessibility features: {', '.join(accessibility)}.",
-        "accessibility"
-    ))
-
-    # ── 23. Languages Spoken ──────────────────────────────────
-    languages = h["facilities"].get("languages_spoken", [])
-    docs_and_ids.append((
-        f"Languages spoken by staff: {', '.join(languages)}.",
-        "languages"
-    ))
-
-    # ── 24. Cleaning Services ─────────────────────────────────
-    cl = h["facilities"].get("cleaning_services", {})
-    docs_and_ids.append((
-        f"Daily housekeeping: {cl.get('daily_housekeeping')}. "
-        f"Guest room cleaning: {cl.get('guest_room_cleaning')}. "
-        f"Disinfectant cleaning: {cl.get('disinfectant_cleaning')}. "
-        f"Laundry: available at additional charge. "
-        f"Dry cleaning: available at additional charge. "
-        f"Ironing service: available at additional charge.",
-        "cleaning_services"
-    ))
-
-    # ── 25. Public Transit ────────────────────────────────────
-    transit = h["area_info"].get("public_transit", [])
-    transit_list = ", ".join([
-        f"{t['name']} ({t['type']}) - {t['distance_km']}km" for t in transit
-    ])
-    docs_and_ids.append((
-        f"Nearby public transit options: {transit_list}.",
-        "public_transit"
-    ))
-
-    # ── 26. FAQs ──────────────────────────────────────────────
-    for i, faq in enumerate(h.get("faqs", [])):
-        docs_and_ids.append((
-            f"FAQ: {faq['question']} Answer: {faq['answer']}",
-            f"faq_{i}"
-        ))
-
-    # ── 27. Guest Reviews ─────────────────────────────────────
-    for i, rv in enumerate(h.get("guest_reviews", [])):
-        docs_and_ids.append((
-            f"Guest review by {rv['reviewer']} ({rv['country']}), "
-            f"{rv['room_type']}, {rv['stay_duration']}, "
-            f"Rating: {rv['rating']}/10. "
-            f"Positive: {rv['positive']}. "
-            f"Negative: {rv.get('negative', 'None')}.",
-            f"review_{i}"
-        ))
-
-    # ── 28. Fine Print ────────────────────────────────────────
-    fine_print = h.get("fine_print", [])
-    docs_and_ids.append((
-        f"Important notes: {' '.join(fine_print)}",
-        "fine_print"
-    ))
-
-    # ── 29. Contact Details ───────────────────────────────────
-    contact = h.get("contact", {})
-    phone   = contact.get("phone",   "Not available — please check wandrhotels.com")
-    email   = contact.get("email",   "Not available — please check wandrhotels.com")
-    website = contact.get("website", "wandrhotels.com")
-    addr    = contact.get("address_full", "3363 No. 3363, 2nd cross road, HAL 2nd stage, Indiranagar, Bangalore - 560038")
-    docs_and_ids.append((
-        f"Hotel contact details — Phone: {phone}. "
-        f"Email: {email}. Website: {website}. "
-        f"Full address: {addr}.",
-        "contact_details"
-    ))
-
-    # ── 30. Property Master ─────────────────────────────
-    pm = h.get("property_master", {})
-    docs_and_ids.append((
-        f"Property type: {pm.get('property_type')}. "
-        f"Year opened: {pm.get('year_opened')}. "
-        f"Last renovated: {pm.get('last_renovated')}. "
-        f"Total rooms: {pm.get('total_rooms')}. "
-        f"Number of floors: {pm.get('number_of_floors')}. "
-        f"Power backup available: {pm.get('power_backup')}. "
-        f"EV charging available: {pm.get('ev_charging')}. "
-        f"Valet parking available: {pm.get('valet_parking')}.",
-        "property_master"
-    ))
-
-    # ── 31. Location Intelligence ──────────────────────
-    loc = h.get("location_intelligence", {})
-
-    # Hospitals, pharmacies, ATMs, groceries, petrol
-    docs_and_ids.append((
-        f"Nearest hospitals: {', '.join(loc.get('nearest_hospital', []))}. "
-        f"Nearest pharmacies: {', '.join(loc.get('nearest_pharmacy', []))}. "
-        f"Nearest ATMs: {', '.join(loc.get('nearest_atm', []))}. "
-        f"Nearest grocery stores: {', '.join(loc.get('nearest_grocery_store', []))}. "
-        f"Nearest petrol stations: {', '.join(loc.get('nearest_petrol_bunk', []))}.",
-        "location_intelligence"
-    ))
-
-    # Metro stations
-    metro = loc.get("nearest_metro_stations", [])
-    if metro:
-        docs_and_ids.append((
-            f"Nearest metro stations from the hotel: {', '.join(metro)}. "
-            f"All stations are on the Purple Line of Namma Metro.",
-            "nearest_metro_stations"
-        ))
-
-    # Shopping areas and malls
-    shopping = loc.get("nearest_shopping", [])
-    if shopping:
-        docs_and_ids.append((
-            f"Nearby shopping areas and malls: {', '.join(shopping)}.",
-            "nearest_shopping"
-        ))
-
-    # Nearby restaurants and cafes
-    nearby_rest = loc.get("nearby_restaurants_cafes", [])
-    if nearby_rest:
-        docs_and_ids.append((
-            f"Nearby restaurants and cafes close to the hotel: {', '.join(nearby_rest)}.",
-            "nearby_restaurants_cafes"
-        ))
-
-    # Police stations
-    police = loc.get("nearest_police_station", [])
-    if police:
-        docs_and_ids.append((
-            f"Nearest police stations to the hotel: {', '.join(police)}.",
-            "nearest_police_station"
-        ))
-
-    # Safety at night
-    safe_night = loc.get("safe_at_night", [])
-    if safe_night:
-        docs_and_ids.append((
-            f"Safety at night around the hotel: {', '.join(safe_night)}.",
-            "safe_at_night"
-        ))
-
-    # Railway stations
-    railway = loc.get("railway_station_distance_km", [])
-    if railway:
-        docs_and_ids.append((
-            f"Nearest railway stations: {', '.join(railway)}.",
-            "nearest_railway_stations"
-        ))
-
-    # Landmarks
-    landmarks = loc.get("nearby_landmarks", [])
-    if landmarks:
-        docs_and_ids.append((
-            f"Nearby landmarks and attractions: {', '.join(landmarks)}.",
-            "nearby_landmarks"
-        ))
-
-    # Airport travel time
-    airport_time = loc.get("airport_travel_time_minutes", [])
-    if airport_time:
-        docs_and_ids.append((
-            f"Travel time to Kempegowda International Airport: {', '.join(airport_time)}.",
-            "airport_travel_time"
-        ))
-
-    # Cab accessibility
-    cab = loc.get("cab_accessibility", [])
-    if cab:
-        docs_and_ids.append((
-            f"Cab and auto availability near the hotel: {', '.join(cab)}.",
-            "cab_accessibility"
-        ))
-
-    # ── 32. Room Specifications ────────────────────────
-    specs = h.get("room_specs", {})
-    docs_and_ids.append((
-        f"Room sizes: {specs.get('room_size_sqft')}. "
-        f"Bed dimensions: {specs.get('bed_dimensions')}. "
-        f"Mattress type: {specs.get('mattress_type')}. "
-        f"Hot water availability: {specs.get('hot_water_availability')}. "
-        f"Blackout curtains: {specs.get('blackout_curtains')}. "
-        f"Workspace friendly: {specs.get('workspace_friendly')}. "
-        f"Smart TV available: {specs.get('smart_tv')}.",
-        "room_specs"
-    ))
-
-    # ── 33. Digital Experience ─────────────────────────
-    dx = h.get("digital_experience", {})
-    docs_and_ids.append((
-        f"Mobile check-in: {dx.get('mobile_check_in')}. "
-        f"Digital check-out: {dx.get('digital_check_out')}. "
-        f"Online KYC: {dx.get('online_kyc')}. "
-        f"WhatsApp concierge: {dx.get('whatsapp_concierge')}. "
-        f"QR room service: {dx.get('qr_room_service')}. "
-        f"WiFi speed: {dx.get('wifi_speed_mbps')} Mbps. "
-        f"Backup internet provider: {dx.get('backup_internet_provider')}.",
-        "digital_experience"
-    ))
-
-    # ── 34. Food & Dining Details ──────────────────────
-    food = h.get("food_and_dining_details", {})
-    docs_and_ids.append((
-        f"Breakfast timings: {food.get('breakfast_timings')}. "
-        f"Breakfast type: {food.get('breakfast_type')}. "
-        f"Room service timings: {food.get('room_service_timings')}. "
-        f"Late night food available: {food.get('late_night_food_available')}. "
-        f"Complimentary tea and coffee: {food.get('complimentary_tea_coffee')}. "
-        f"Outside delivery apps allowed: {food.get('outside_delivery_apps_allowed')}.",
-        "food_dining_details"
-    ))
-
-    # ── 35. Cleaning & Hygiene ─────────────────────────
-    clean = h.get("cleaning_hygiene", {})
-    docs_and_ids.append((
-        f"Room cleaning frequency: {clean.get('room_cleaning_frequency')}. "
-        f"Linen change frequency: {clean.get('linen_change_frequency')}. "
-        f"Sanitization process: {clean.get('sanitization_process')}. "
-        f"RO drinking water available: {clean.get('ro_drinking_water')}.",
-        "cleaning_hygiene"
-    ))
-
-    # ── 36. Safety & Emergency ─────────────────────────
-    safe = h.get("safety_emergency", {})
-    docs_and_ids.append((
-        f"Doctor on call: {safe.get('doctor_on_call')}. "
-        f"First aid kit available: {safe.get('first_aid_kit_available')}. "
-        f"Fire exit map in rooms: {safe.get('fire_exit_map_in_rooms')}. "
-        f"Emergency contact process: {safe.get('emergency_contact_process')}. "
-        f"Female traveler safety rating: {safe.get('female_traveler_safety_rating')}.",
-        "safety_emergency"
-    ))
-
-    # ── 37. Billing Details ────────────────────────────
-    bill = h.get("billing_details", {})
-    gst = bill.get("gst_breakdown", {})
-    docs_and_ids.append((
-        f"UPI accepted: {bill.get('upi_accepted')}. "
-        f"Split payment supported: {bill.get('split_payment_supported')}. "
-        f"Corporate billing available: {bill.get('corporate_billing_available')}. "
-        f"Refund timeline: {bill.get('refund_timeline_days')} days. "
-        f"GST percentage: {gst.get('total_gst_percentage')}%.",
-        "billing_details"
-    ))
-
-    # ── 38. Booking Operations ─────────────────────────
-    booking = h.get("booking_operations", {})
-    docs_and_ids.append((
-        f"Walk-in guests allowed: {booking.get('walk_in_guests_allowed')}. "
-        f"Tentative booking available: {booking.get('tentative_booking_available')}. "
-        f"Booking modification policy: {booking.get('booking_modification_policy')}. "
-        f"No-show policy: {booking.get('no_show_policy')}.",
-        "booking_operations"
-    ))
-
-    # ── 39. Event Services ─────────────────────────────
-    event = h.get("event_services", {})
-    docs_and_ids.append((
-        f"Birthday decorations: {event.get('birthday_decorations')}. "
-        f"Anniversary setup: {event.get('anniversary_setup')}. "
-        f"Cake arrangement: {event.get('cake_arrangement')}.",
-        "event_services"
-    ))
-
-    # ── 40. Business Traveler Features ────────────────
-    biz = h.get("business_traveler_features", {})
-    docs_and_ids.append((
-        f"Printing service: {biz.get('printing_service')}. "
-        f"Scanning service: {biz.get('scanning_service')}. "
-        f"Weekly rates: {biz.get('weekly_rates_available')}. "
-        f"Monthly stay discount: {biz.get('monthly_stay_discount')}.",
-        "business_traveler_features"
-    ))
-
-
-    documents = [d for d, _ in docs_and_ids if d]
-    ids       = [i for _, i in docs_and_ids if i]
-    return documents, ids
-
-
-# ── Query Function ────────────────────────────────────────────
-def get_relevant_context(query: str, top_k: int = 6) -> str:
-    """
-    Semantic search on ChromaDB.
-    Returns top_k most relevant hotel info chunks for the query.
-    """
-    try:
-        results = collection.query(
-            query_texts=[query],
-            n_results=top_k
+        specs = _HOTEL["room_specs"]
+        size_key = room["room_type"].lower().replace(" ", "_")
+        size = specs["room_size_sqft"].get(size_key, "N/A")
+        lines.append(
+            f"- {room['room_type']}: ₹{base}/night | Bed: {room.get('bed_type','N/A')} | "
+            f"Size: {size} sqft | Amenities: {amenities}"
         )
+    lines.append(f"Bed sizes — Queen: {_HOTEL['room_specs']['bed_dimensions']['queen_bed']}, "
+                 f"Single: {_HOTEL['room_specs']['bed_dimensions']['single_bed']}")
+    lines.append(f"Mattress: {_HOTEL['room_specs']['mattress_type']}")
+    lines.append(f"Blackout curtains: {'Yes' if _HOTEL['room_specs']['blackout_curtains'] else 'No'}")
+    lines.append(f"Smart TV: {'Yes' if _HOTEL['room_specs']['smart_tv'] else 'No'}")
+    lines.append(f"Hot water: {_HOTEL['room_specs']['hot_water_availability']}")
+    return "\n".join(lines)
 
-        if results and results["documents"] and results["documents"][0]:
-            context_lines = []
-            for i, doc in enumerate(results["documents"][0], 1):
-                if doc:
-                    context_lines.append(f"{i}. {doc}")
-            return "\n".join(context_lines)
-        else:
-            return "No relevant information found in knowledge base."
+def _section_pricing() -> str:
+    lines = ["PRICING:"]
+    for room in _HOTEL["rooms"]:
+        pricing = room.get("pricing", {})
+        base = pricing.get("base_price_per_night_inr", "N/A")
+        weekend = pricing.get("weekend_price_inr", "N/A")
+        lines.append(f"- {room['room_type']}: ₹{base}/night (weekday), ₹{weekend}/night (weekend)")
+    gst = _HOTEL["billing_details"]["gst_breakdown"]
+    lines.append(f"GST: {gst['total_gst_percentage']}% (CGST {gst['cgst_percentage']}% + SGST {gst['sgst_percentage']}%)")
+    lines.append(f"Refund timeline: {_HOTEL['billing_details']['refund_timeline_days']} days")
+    lines.append(f"Split payment supported: Yes")
+    lines.append(f"Corporate billing available: Yes")
+    return "\n".join(lines)
 
-    except Exception as e:
-        print(f"[Chroma] Query error: {e}")
-        return "Error retrieving information from knowledge base."
+def _section_checkin() -> str:
+    p = _HOTEL["policies"]
+    return (
+        f"CHECK-IN / CHECK-OUT:\n"
+        f"Check-in: {p['check_in_time']}\n"
+        f"Check-out: {p['check_out_time']}\n"
+        f"Early check-in: {p.get('early_check_in', 'Subject to availability')}\n"
+        f"Late check-out: {p.get('late_check_out', 'Subject to availability')}\n"
+        f"Express check-in/check-out: Available\n"
+        f"Private check-in/check-out: Available\n"
+        f"Walk-in guests allowed: Yes\n"
+        f"Online KYC: Yes\n"
+        f"Mobile check-in: Yes\n"
+        f"Digital check-out: Yes"
+    )
 
-# ── Index only if collection is empty (skip on subsequent startups) ──
-collection = client.get_or_create_collection(
-    name=COLLECTION_NAME,
-    metadata={"hnsw:space": "cosine"}
-)
+def _section_food() -> str:
+    f_d = _HOTEL["food_and_dining_details"]
+    fac = _HOTEL["facilities"]
+    return (
+        f"FOOD & DINING:\n"
+        f"Restaurant on-site: Yes ({fac['restaurant_note']})\n"
+        f"Breakfast timings: {f_d['breakfast_timings']}\n"
+        f"Breakfast type: {f_d['breakfast_type']}\n"
+        f"Room service: {f_d['room_service_timings']}\n"
+        f"Late night food: {'Yes' if f_d['late_night_food_available'] else 'No'}\n"
+        f"Complimentary tea/coffee: {'Yes' if f_d['complimentary_tea_coffee'] else 'No'}\n"
+        f"Outside food delivery (Swiggy/Zomato) allowed: {'Yes' if f_d['outside_delivery_apps_allowed'] else 'No'}\n"
+        f"Outside food and beverages allowed: Yes\n"
+        f"RO drinking water: Yes"
+    )
 
-# Only index if empty
-if collection.count() == 0:
-    print("[Chroma] Indexing hotel knowledge base...")
-    documents, ids = prepare_documents()
-    if documents:
-        collection.add(
-            ids=ids,
-            documents=documents,
-            metadatas=[{"source": "wandr_indiranagar"} for _ in documents]
-        )
-        print(f"[Chroma] Indexed {len(documents)} documents successfully.")
-else:
-    print(f"[Chroma] Using cached index ({collection.count()} docs).")
+def _section_internet() -> str:
+    net = _HOTEL["facilities"]["internet"]
+    dig = _HOTEL["digital_experience"]
+    return (
+        f"WIFI & INTERNET:\n"
+        f"WiFi available: {'Yes' if net['wifi_available'] else 'No'}\n"
+        f"Coverage: {net['wifi_areas']}\n"
+        f"Cost: {net['wifi_cost']}\n"
+        f"Speed: {dig['wifi_speed_mbps']} Mbps\n"
+        f"Backup provider: {dig['backup_internet_provider']}\n"
+        f"WhatsApp concierge: Yes\n"
+        f"QR room service: Yes"
+    )
+
+def _section_parking() -> str:
+    p = _HOTEL["facilities"]["parking"]
+    pm = _HOTEL["property_master"]
+    return (
+        f"PARKING:\n"
+        f"Available: {'Yes' if p['available'] else 'No'}\n"
+        f"Type: {p['type']}\n"
+        f"Reservation needed: {'Yes' if p['reservation_needed'] else 'No'}\n"
+        f"Parking garage: {'Yes' if p['parking_garage'] else 'No'}\n"
+        f"Accessible parking: {'Yes' if p['accessible_parking'] else 'No'}\n"
+        f"Capacity: {p['capacity']}\n"
+        f"EV charging: {'Yes' if pm['ev_charging'] else 'No'}\n"
+        f"Valet parking: {'Yes' if pm['valet_parking'] else 'No'}"
+    )
+
+def _section_fitness_pool() -> str:
+    fac = _HOTEL["facilities"]
+    return (
+        f"FITNESS & POOL:\n"
+        f"Gym/Fitness center: {'Yes' if fac['fitness_center'] else 'No, we do not have a gym or fitness center at this property.'}\n"
+        f"Swimming pool: {'Yes' if fac['swimming_pool'] else 'No, we do not have a swimming pool at this property.'}"
+    )
+
+def _section_location() -> str:
+    h = _HOTEL
+    pm = h["property_master"]
+    li = h["location_intelligence"]
+    return (
+        f"LOCATION:\n"
+        f"Address: {h['contact']['address_full']}\n"
+        f"Distance from city center: {h['distance_from_city_center_km']} km\n"
+        f"Distance from airport: {h['distance_from_airport_km']} km\n"
+        f"Airport travel time: {li['airport_travel_time_minutes'][0]}\n"
+        f"Nearby landmarks: {', '.join(pm['landmarks'])}\n"
+        f"Railway stations: {', '.join(li['railway_station_distance_km'])}\n"
+        f"Google Maps: {pm['google_maps_url']}"
+    )
+
+def _section_nearby() -> str:
+    li = _HOTEL["location_intelligence"]
+    nearby = _HOTEL.get("nearby_places", {})
+    lines = ["NEARBY PLACES:"]
+    if nearby:
+        for category, places in nearby.items():
+            if isinstance(places, list):
+                lines.append(f"{category.replace('_',' ').title()}: {', '.join(str(p) for p in places[:3])}")
+    lines.append(f"Nearest hospitals: {', '.join(li['nearest_hospital'][:2])}")
+    lines.append(f"Nearest ATMs: {', '.join(li['nearest_atm'][:2])}")
+    lines.append(f"Nearest pharmacy: {', '.join(li['nearest_pharmacy'][:2])}")
+    lines.append(f"Nearest grocery: {', '.join(li['nearest_grocery_store'][:2])}")
+    lines.append(f"Cab access: {li['cab_accessibility'][0]}")
+    return "\n".join(lines)
+
+def _section_nearby_restaurants() -> str:
+    nearby = _HOTEL.get("nearby_places", {})
+    lines = ["NEARBY RESTAURANTS:"]
+    found = False
+    for key, val in nearby.items():
+        if "restaurant" in key.lower() or "dining" in key.lower() or "food" in key.lower():
+            if isinstance(val, list):
+                for item in val:
+                    lines.append(f"- {item}")
+                found = True
+    if not found:
+        lines.append("For nearby restaurant recommendations, please ask our front desk — "
+                     "they know the best spots in Indiranagar.")
+    return "\n".join(lines)
+
+def _section_transport() -> str:
+    li = _HOTEL["location_intelligence"]
+    shuttle = _HOTEL["facilities"]["airport_shuttle"]
+    return (
+        f"TRANSPORT & GETTING AROUND:\n"
+        f"Airport shuttle: {'Yes' if shuttle['available'] else 'No'} "
+        f"({'additional charge' if shuttle['additional_charge'] else 'free'}, "
+        f"request: {shuttle['request']})\n"
+        f"Cab availability: {li['cab_accessibility'][0]}\n"
+        f"Traffic: {li['traffic_level'][0]}\n"
+        f"Railway stations: {', '.join(li['railway_station_distance_km'][:2])}\n"
+        f"Airport travel time: {li['airport_travel_time_minutes'][0]}"
+    )
+
+def _section_safety() -> str:
+    fac = _HOTEL["facilities"]
+    li = _HOTEL["location_intelligence"]
+    se = _HOTEL["safety_emergency"]
+    return (
+        f"SAFETY & SECURITY:\n"
+        f"Security features: {', '.join(fac['safety_and_security'])}\n"
+        f"Safe at night: {li['safe_at_night'][0]}\n"
+        f"Female traveler safety: {se['female_traveler_safety_rating']}\n"
+        f"Doctor on call: {'Yes' if se['doctor_on_call'] else 'No'}\n"
+        f"First aid kit: {'Yes' if se['first_aid_kit_available'] else 'No'}\n"
+        f"Emergency contact: {se['emergency_contact_process']}"
+    )
+
+def _section_laundry() -> str:
+    c = _HOTEL["facilities"]["cleaning_services"]
+    return (
+        f"LAUNDRY & CLEANING:\n"
+        f"Daily housekeeping: {'Yes' if c['daily_housekeeping'] else 'No'}\n"
+        f"Laundry service: {'Yes' if c['laundry']['available'] else 'No'} "
+        f"({'extra charge' if c['laundry']['additional_charge'] else 'free'})\n"
+        f"Dry cleaning: {'Yes' if c['dry_cleaning']['available'] else 'No'} "
+        f"({'extra charge' if c['dry_cleaning']['additional_charge'] else 'free'})\n"
+        f"Ironing service: {'Yes' if c['ironing_service']['available'] else 'No'} "
+        f"({'extra charge' if c['ironing_service']['additional_charge'] else 'free'})\n"
+        f"Linen change: {_HOTEL['cleaning_hygiene']['linen_change_frequency']}"
+    )
+
+def _section_billing() -> str:
+    b = _HOTEL["billing_details"]
+    return (
+        f"PAYMENT & BILLING:\n"
+        f"Accepted: Credit card, Debit card, UPI\n"
+        f"GST: {b['gst_breakdown']['total_gst_percentage']}%\n"
+        f"Refund timeline: {b['refund_timeline_days']} days\n"
+        f"Split payment: {'Yes' if b['split_payment_supported'] else 'No'}\n"
+        f"Corporate billing: {'Yes' if b['corporate_billing_available'] else 'No'}\n"
+        f"Security deposit: {b['security_deposit'] or 'Not required'}"
+    )
+
+def _section_smoking() -> str:
+    policies = _HOTEL.get("policies", {})
+    rules = _HOTEL.get("house_rules", [])
+    smoking_rules = [r for r in rules if "smok" in r.lower()]
+    return (
+        f"SMOKING POLICY:\n"
+        f"Non-smoking throughout: Yes\n"
+        f"Designated smoking area: Yes (outdoor)\n"
+        f"Rules: {'; '.join(smoking_rules) if smoking_rules else 'Non-smoking property with designated outdoor area'}"
+    )
+
+def _section_pets() -> str:
+    rules = _HOTEL.get("house_rules", [])
+    pet_rules = [r for r in rules if "pet" in r.lower() or "animal" in r.lower()]
+    policies = _HOTEL.get("policies", {})
+    pets_allowed = policies.get("pets_allowed", False)
+    return (
+        f"PETS POLICY:\n"
+        f"Pets allowed: {'Yes' if pets_allowed else 'No'}\n"
+        f"Details: {'; '.join(pet_rules) if pet_rules else 'Pets are not allowed at this property.'}"
+    )
+
+def _section_policies() -> str:
+    p = _HOTEL["policies"]
+    rules = _HOTEL.get("house_rules", [])
+    return (
+        f"POLICIES & HOUSE RULES:\n"
+        f"Check-in: {p['check_in_time']} | Check-out: {p['check_out_time']}\n"
+        f"Cancellation: {p.get('cancellation_policy', 'Please check at time of booking')}\n"
+        f"Children policy: {p.get('children_policy', 'Children welcome')}\n"
+        f"Age restriction: {p.get('age_restriction', 'Guests under 18 must be with parent/guardian')}\n"
+        f"House rules: {' | '.join(rules[:6]) if rules else 'Standard hotel policies apply'}"
+    )
+
+def _section_accessibility() -> str:
+    acc = _HOTEL["facilities"].get("accessibility", [])
+    gen = _HOTEL["facilities"].get("general", [])
+    lift = "Yes" in str(gen) and "Lift" in str(gen)
+    return (
+        f"ACCESSIBILITY:\n"
+        f"Wheelchair accessible: Yes\n"
+        f"Elevator/Lift: Yes\n"
+        f"Accessible parking: Yes\n"
+        f"Features: {', '.join(acc)}"
+    )
+
+def _section_events() -> str:
+    ev = _HOTEL["event_services"]
+    return (
+        f"EVENTS & CELEBRATIONS:\n"
+        f"Birthday decorations: {ev['birthday_decorations']}\n"
+        f"Anniversary setup: {ev['anniversary_setup']}\n"
+        f"Cake arrangement: {ev['cake_arrangement']}\n"
+        f"Bachelor parties: Not allowed\n"
+        f"Private dining: {ev['private_dining'] or 'Not available'}"
+    )
+
+def _section_business() -> str:
+    biz = _HOTEL["business_traveler_features"]
+    dig = _HOTEL["digital_experience"]
+    return (
+        f"BUSINESS TRAVELER FEATURES:\n"
+        f"Printing: {biz['printing_service']}\n"
+        f"Scanning: {biz['scanning_service']}\n"
+        f"Meeting room: {biz['meeting_room_available'] or 'Not available'}\n"
+        f"Co-working space: {biz['coworking_space'] or 'Not available'}\n"
+        f"Weekly/monthly rates: {biz['weekly_rates_available']}\n"
+        f"WiFi speed: {dig['wifi_speed_mbps']} Mbps\n"
+        f"Workspace-friendly rooms: Yes"
+    )
+
+# ── Intent → section mapping ──────────────────────────────────
+INTENT_SECTIONS = {
+    "fitness_center": [_section_fitness_pool],
+    "swimming_pool":  [_section_fitness_pool],
+    "internet":       [_section_internet],
+    "parking":        [_section_parking],
+    "food":           [_section_food],
+    "checkin":        [_section_checkin],
+    "checkout":       [_section_checkin],
+    "rooms":          [_section_rooms],
+    "pricing":        [_section_pricing, _section_rooms],
+    "location":       [_section_location],
+    "nearby":         [_section_nearby, _section_location],
+    "nearby_restaurants": [_section_nearby_restaurants, _section_nearby],
+    "transport":      [_section_transport, _section_location],
+    "safety":         [_section_safety],
+    "laundry":        [_section_laundry],
+    "billing":        [_section_billing],
+    "smoking":        [_section_smoking],
+    "pets":           [_section_pets],
+    "accessibility":  [_section_accessibility],
+    "events":         [_section_events],
+    "business":       [_section_business],
+}
+
+# ── Core retrieval function ───────────────────────────────────
+
+def get_relevant_context(query: str, top_k: int = 3) -> str:
+    """
+    Drop-in replacement for ChromaDB get_relevant_context().
+    Maps query keywords → relevant JSON sections → context string.
+    """
+    q = query.lower()
+    q = re.sub(r"[^\w\s]", " ", q)  # strip punctuation
+
+    # Resolve synonyms to intents
+    matched_intents = set()
+    for keyword, intent in SYNONYMS.items():
+        if keyword in q:
+            matched_intents.add(intent)
+
+    # Collect unique section builders
+    builders = []
+    seen = set()
+    for intent in matched_intents:
+        for fn in INTENT_SECTIONS.get(intent, []):
+            if fn not in seen:
+                builders.append(fn)
+                seen.add(fn)
+
+    # Always include general info
+    if _section_general not in seen:
+        builders.insert(0, _section_general)
+
+    # Cap at top_k + 1 sections (general + top_k relevant)
+    builders = builders[:top_k + 1]
+
+    # If nothing matched, return general + policies
+    if len(builders) <= 1:
+        builders = [_section_general, _section_policies, _section_checkin]
+
+    context_parts = []
+    for fn in builders:
+        try:
+            context_parts.append(fn())
+        except Exception as e:
+            print(f"[KB] Section error in {fn.__name__}: {e}")
+
+    return "\n\n".join(context_parts)
