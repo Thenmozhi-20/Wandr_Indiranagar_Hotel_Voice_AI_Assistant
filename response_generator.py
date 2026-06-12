@@ -1,7 +1,6 @@
 # ============================================================
 #  response_generator.py  —  Wandr Hotels AI Brain
-#  ChromaDB-powered knowledge base + Groq LLaMA 3
-#  Fixed: strict hallucination prevention
+#  JSON knowledge base + Groq LLaMA 3
 # ============================================================
 
 from groq import Groq
@@ -13,142 +12,114 @@ client = Groq(api_key=GROQ_API_KEY)
 # ── Conversation history ──────────────────────────────────────
 chat_history = []
 
-# ── System prompt — strict grounding ─────────────────────────
-SYSTEM_PROMPT = """
-You are Maya, the front desk assistant for Wandr Indiranagar, Bangalore.
+# ── System prompt ─────────────────────────────────────────────
+SYSTEM_PROMPT = """You are Maya, the front desk assistant for Wandr Indiranagar, Bangalore.
 
 STRICT RULES — FOLLOW EXACTLY:
 
-1. Answer ONLY using facts from the HOTEL CONTEXT below.
-2. If something is NOT in the context, say exactly:
+1. Answer ONLY using facts from the HOTEL CONTEXT below. No exceptions.
+2. If the answer is NOT clearly stated in the context, say EXACTLY:
    "I don't have that information — please contact our front desk directly."
-3. NEVER guess, assume, or use your own knowledge to fill gaps.
-4. NEVER mention payment methods like UPI, GPay, PhonePe, Paytm, or net banking
-   — the hotel only accepts what is listed in the context.
-5. NEVER mention malls, restaurants, or places NOT listed in the context.
-6. NEVER offer to generate QR codes, process payments, or confirm bookings
-   — you only provide information, not transactions.
-7. If context says the gym/fitness center is NOT available, say:
-   "No, we do not have a gym or fitness center at this property."
-8. If context says the swimming pool is NOT available, say:
-   "No, we do not have a swimming pool at this property."
-9. For nearby restaurants, use ONLY the restaurants listed in the context
-   under nearby restaurants. Do NOT use nearby places/landmarks as restaurants.
-10. Keep replies to 2-3 sentences. Be warm and direct.
-11. Never use bullet points or markdown formatting.
-12. For dinner/lunch questions: check if the hotel restaurant serves those meals
-    from the context before answering.
-13. Match your reply to the EXACT intent of the question:
-    - Guest says "I want to book / make a reservation / reserve a room"
-      → ONLY say: "We'd love to host you! To complete your booking, please 
-      call our front desk or visit wandrhotels.com. Can I help you with 
-      anything else?" Do NOT mention room types, prices, or amenities.
-    - Guest asks "What rooms do you have?" → briefly list room types only
-    - Guest asks "What is the price?" → give pricing only
-    Never volunteer information the guest did not ask for.
+3. NEVER use your own knowledge. NEVER guess. NEVER assume.
+4. NEVER invent nearby places, hospitals, bus stands, railway stations, or restaurants
+   that are not explicitly listed in the context.
+5. NEVER mention honeymoon packages, complimentary upgrades, candlelit dinners,
+   or special packages unless they are explicitly listed in the context.
+6. NEVER mention payment methods not listed in the context.
+7. Keep every reply to 1-2 short sentences only. No exceptions.
+8. Never use bullet points or lists. Plain sentences only.
+9. Be warm but very brief and direct.
+10. For booking requests → say: "We'd love to host you! Please call our front desk
+    or visit wandrhotels.com to complete your booking."
+11. For celebrations/events → only mention what is explicitly in the context.
+    Do NOT invent packages or services.
 
 HOTEL CONTEXT:
 {context}
 """
 
-# ── Known hallucination triggers ──────────────────────────────
+# ── Hallucination triggers ────────────────────────────────────
 HALLUCINATION_TRIGGERS = [
     "gpay", "google pay", "phonepay", "phonepe", "paytm",
-    "net banking", "upi", "qr code", "qr-code",
+    "net banking", "qr code", "qr-code",
     "forum mall", "garuda mall", "orion mall",
     "i'll generate", "i will generate",
     "booking confirmed", "reservation confirmed",
     "i'll book", "i will book",
-    "i'll process", "i will process"
+    "candlelit dinner", "bouquet of flowers",
+    "complimentary upgrade", "honeymoon package",
+    "special package", "romantic package",
 ]
 
-# ── Intent shortcuts (skip ChromaDB for known intents) ────────
+# ── Booking intent shortcuts ──────────────────────────────────
 BOOKING_TRIGGERS = [
     "book a room", "make a reservation", "reserve a room",
     "want to book", "i want to stay", "how do i book",
-    "can i book", "booking"
+    "can i book", "booking", "book room"
 ]
 
 BOOKING_REPLY = (
-    "We'd love to host you at Wandr Indiranagar! To complete your booking, "
-    "please call our front desk or visit wandrhotels.com. "
-    "Can I help you with anything else?"
+    "We'd love to host you at Wandr Indiranagar! "
+    "Please call our front desk or visit wandrhotels.com to complete your booking."
 )
 
+
 def get_ai_response(user_text: str) -> str:
-    """
-    Takes user question → ChromaDB semantic search →
-    Groq LLaMA 3 generates grounded reply.
-    """
     global chat_history
 
-    # ── Shortcut: booking intent ──────────────────────────────
-    if any(trigger in user_text.lower() for trigger in BOOKING_TRIGGERS):
+    # ── Booking shortcut ──────────────────────────────────────
+    if any(t in user_text.lower() for t in BOOKING_TRIGGERS):
         chat_history.append({"role": "user", "content": user_text})
         chat_history.append({"role": "assistant", "content": BOOKING_REPLY})
         return BOOKING_REPLY
 
     try:
-        # Step 1: Semantic search on ChromaDB
+        # Step 1: Get relevant context from JSON knowledge base
         context = get_relevant_context(user_text, top_k=3)
-        print(f"[KB] Context length: {len(context)} chars")
 
-        # Step 2: Build conversation history
-        history_str = ""
-        for msg in chat_history[-6:]:
-            role = "Guest" if msg["role"] == "user" else "Maya"
-            history_str += f"{role}: {msg['content']}\n"
-
-        # Step 3: Build full system prompt
+        # Step 2: Build system prompt with context
         system = SYSTEM_PROMPT.format(context=context)
-        if history_str:
-            system += f"\nCONVERSATION SO FAR:\n{history_str}"
 
-        # Step 4: Save user message to history
-        chat_history.append({"role": "user", "content": user_text})
+        # Step 3: Only pass last 4 messages of history (keeps it fast)
+        messages = [{"role": "system", "content": system}]
+        for msg in chat_history[-4:]:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+        messages.append({"role": "user", "content": user_text})
 
-        # Step 5: Call Groq LLaMA with very low temperature
+        # Step 4: Call Groq — using faster model, strict token limit
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user",   "content": user_text}
-            ],
-            max_tokens=100,
-            temperature=0.1,   # Very low = minimal hallucination
-            top_p=0.8
+            model="llama-3.1-8b-instant",  # fastest Groq model
+            messages=messages,
+            max_tokens=80,       # strict short replies
+            temperature=0.0,     # zero randomness = no hallucination
+            top_p=0.7
         )
 
         reply = response.choices[0].message.content.strip()
 
-        # Step 6: Post-processing — block hallucinated content
-        if any(trigger in reply.lower() for trigger in HALLUCINATION_TRIGGERS):
-            print(f"[HALLUCINATION BLOCKED] Fabricated content detected in reply.")
-            reply = (
-                "For payment or booking assistance, please contact our "
-                "front desk directly or visit wandrhotels.com."
-            )
+        # Step 5: Block hallucinated content
+        if any(t in reply.lower() for t in HALLUCINATION_TRIGGERS):
+            print(f"[HALLUCINATION BLOCKED]: {reply}")
+            reply = "I don't have that information — please contact our front desk directly."
 
-        # Step 7: Save reply to history
+        # Step 6: Save to history (keep last 6 only)
+        chat_history.append({"role": "user", "content": user_text})
         chat_history.append({"role": "assistant", "content": reply})
+        if len(chat_history) > 6:
+            chat_history = chat_history[-6:]
 
-        # Keep only last 10 messages
-        if len(chat_history) > 10:
-            chat_history = chat_history[-10:]
-
-        print(f"[Reply] {reply}\n")
+        print(f"[Reply] {reply}")
         return reply
 
     except Exception as e:
         print(f"[Groq Error] {e}")
         return (
             "I'm having a little trouble right now. "
-            "Please contact our front desk or visit wandrhotels.com for assistance."
+            "Please contact our front desk or visit wandrhotels.com."
         )
 
 
 def reset_conversation():
-    """Reset conversation for a fresh start."""
     global chat_history
     chat_history = []
     print("[Conversation reset]")
