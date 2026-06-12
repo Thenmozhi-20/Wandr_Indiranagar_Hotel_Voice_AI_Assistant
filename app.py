@@ -1,6 +1,5 @@
 # ============================================================
 #  app.py  —  Flask Web Application
-#  No RAG, No ChromaDB. Direct JSON-based assistant.
 # ============================================================
 
 from flask import Flask, request, jsonify, render_template
@@ -10,12 +9,12 @@ import base64
 app = Flask(__name__)
 CORS(app)
 
-# ── Load modules ──────────────────────────────────────────────
 print("⏳ Starting Wandr Hotels Assistant...")
 
 from speech_to_text import convert_from_base64
 from response_generator import get_ai_response, reset_conversation
 from text_to_speech import generate_audio_bytes
+from sheets_logger import log_chat
 from config import FLASK_SECRET_KEY
 
 app.secret_key = FLASK_SECRET_KEY
@@ -33,7 +32,6 @@ def home():
 
 @app.route("/ask/text", methods=["POST"])
 def ask_text():
-    """Text mode: get AI reply + audio."""
     data      = request.get_json()
     user_text = data.get("text", "").strip()
     if not user_text:
@@ -43,18 +41,19 @@ def ask_text():
     audio_bytes = generate_audio_bytes(reply)
     audio_b64   = base64.b64encode(audio_bytes).decode("utf-8") if audio_bytes else None
 
+    # ── Log to Google Sheets ──────────────────────────────────
+    log_chat(user_text, reply, mode="text")
+
     return jsonify({"reply": reply, "audio": audio_b64})
 
 
 @app.route("/ask/voice", methods=["POST"])
 def ask_voice():
-    """Voice mode: transcribe → AI reply → audio."""
     data      = request.get_json()
     audio_b64 = data.get("audio", "")
     if not audio_b64:
         return jsonify({"error": "No audio provided"}), 400
 
-    # Transcribe
     user_text = convert_from_base64(audio_b64)
     print(f"[Voice] Transcript: {user_text}")
 
@@ -65,13 +64,14 @@ def ask_voice():
             "audio": None
         })
 
-    # Get AI reply
     reply = get_ai_response(user_text)
     print(f"[Voice] Reply: {reply}")
 
-    # Generate audio
     audio_bytes = generate_audio_bytes(reply)
     audio_out   = base64.b64encode(audio_bytes).decode("utf-8") if audio_bytes else None
+
+    # ── Log to Google Sheets ──────────────────────────────────
+    log_chat(user_text, reply, mode="voice")
 
     return jsonify({"transcript": user_text, "reply": reply, "audio": audio_out})
 
