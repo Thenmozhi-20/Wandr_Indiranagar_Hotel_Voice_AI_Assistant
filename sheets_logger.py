@@ -36,14 +36,14 @@ def _get_sheet():
         return None
 
 
-def log_chat(question: str, reply: str, mode: str = "text"):
+def log_chat(question: str, reply: str):
     """Log a question + reply to Google Sheets."""
     try:
         sheet = _get_sheet()
         if sheet is None:
             return
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        sheet.append_row([timestamp, question, reply, mode])
+        sheet.append_row([timestamp, question, reply])
         print(f"[Sheets] Logged: {question[:50]}")
     except Exception as e:
         print(f"[Sheets Log Error] {e}")

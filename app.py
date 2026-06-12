@@ -42,7 +42,7 @@ def ask_text():
     audio_b64   = base64.b64encode(audio_bytes).decode("utf-8") if audio_bytes else None
 
     # ── Log to Google Sheets ──────────────────────────────────
-    log_chat(user_text, reply, mode="text")
+    log_chat(user_text, reply)
 
     return jsonify({"reply": reply, "audio": audio_b64})
 
@@ -71,7 +71,7 @@ def ask_voice():
     audio_out   = base64.b64encode(audio_bytes).decode("utf-8") if audio_bytes else None
 
     # ── Log to Google Sheets ──────────────────────────────────
-    log_chat(user_text, reply, mode="voice")
+    log_chat(user_text, reply)
 
     return jsonify({"transcript": user_text, "reply": reply, "audio": audio_out})
 
