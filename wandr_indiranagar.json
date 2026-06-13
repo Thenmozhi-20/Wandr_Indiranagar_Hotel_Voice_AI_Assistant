@@ -375,12 +375,12 @@
     },
     "house_rules": {
       "check_in": {
-        "from": "13:00",
+        "from": "5",
         "early_check_in": "Subject to availability, at additional cost",
         "note": "Advance notice of arrival time required"
       },
       "check_out": {
-        "until": "11:00",
+        "until": "17",
         "late_check_out": "Subject to availability"
       },
       "cancellation_prepayment": "Varies according to accommodation type",
@@ -757,8 +757,7 @@
       "website": "wandrhotels.com",
       "address_full": "3363 No. 3363, 2nd cross road, HAL 2nd stage, Indiranagar, Bangalore - 560038, Karnataka, India"
     },
-    "property_master": 
-    {
+    "property_master": {
       "property_type": "Boutique Hotel",
       "year_opened": 2025,
       "last_renovated": 2025,
@@ -787,10 +786,10 @@
         "Lohitha Hospital (16th E Main Road)"
       ],
       "nearest_pharmacy": [
-      "S.S Medicals (12th Main Road)",
-      "Apollo Pharmacy (18th Main Road)",
-      "Revive Pharma 24/7 (Paramahansa Yogananda Road)",
-      "Prakash Medicals (80 Feet Road)"
+        "S.S Medicals (12th Main Road)",
+        "Apollo Pharmacy (18th Main Road)",
+        "Revive Pharma 24/7 (Paramahansa Yogananda Road)",
+        "Prakash Medicals (80 Feet Road)"
       ],
       "nearest_atm": [
         "HDFC Bank ATM (100 Feet Road)",
