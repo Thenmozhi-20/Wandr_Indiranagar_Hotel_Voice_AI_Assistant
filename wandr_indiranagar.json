@@ -1,991 +1,1000 @@
 {
   "hotel": {
-    "name": "Wandr Indiranagar, Bangalore",
-    "address": {
-      "street": "3363 No. 3363, 2nd cross road, HAL 2nd stage, Indiranagar",
-      "city": "Bangalore",
-      "pincode": "560038",
-      "state": "Karnataka",
-      "country": "India"
-    },
-    "location_tag": "Excellent location",
-    "distance_from_city_center_km": 4.7,
-    "distance_from_airport_km": 33,
-    "ratings": {
-      "overall_score": 8.3,
-      "overall_label": "Very Good",
-      "total_reviews": 250,
-      "location_score": 9.4,
-      "couples_rating": 9.3,
-      "category_scores": {
-        "staff": 8.9,
-        "facilities": 8.3,
-        "cleanliness": 8.7,
-        "comfort": 8.7,
-        "value_for_money": 8.6,
-        "location": 9.4,
-        "free_wifi": 8.0
-      }
-    },
-    "description": {
-      "comfortable_accommodations": "Wandr Indiranagar in Bangalore offers family rooms with air-conditioning, private bathrooms, and city views. Each room includes a work desk, TV, and free toiletries.",
-      "essential_facilities": "Guests enjoy free WiFi, a terrace, and private check-in and check-out services. Additional amenities include a 24-hour front desk, concierge, and free on-site parking.",
-      "dining_options": "A variety of breakfast options are available, including continental, American, buffet, à la carte, vegetarian, and Asian. Breakfast includes juice and pancakes.",
-      "local_attractions": "Located 4.7 km from The Heritage Centre & Aerospace Museum and 38 km from Kempegowda International Airport, the hotel is close to Brigade Road and Commercial Street.",
-      "popular_with_families": true,
-      "couple_friendly": true
-    },
-    "amenities": [
-      "WiFi",
-      "Fire alarm",
-      "Security Camera",
-      "Fire extinguishers",
-      "Laundry",
-      "Buffet",
-      "Free parking",
-      "Common Area Cleaning",
-      "Coffee Machine",
-      "Wheelchair friendly",
-      "Elevator",
-      "24h lobby",
-      "Seating area",
-      "Credit Card",
-      "Breakfast Buffet",
-      "Guest Room Cleaning",
-      "Disinfectant Cleaning",
-      "Restaurant/cafe",
-      "Security",
-      "Parking",
-      "Couple Friendly",
-      "Debit Card",
-      "Breakfast Available",
-      "Daily House Keeping",
-      "Employees Trained For Cleaning"
-    ],
-    "facilities": {
-      "most_popular": [
-        "Free WiFi",
-        "Airport shuttle",
-        "Family rooms",
-        "Free parking",
-        "Non-smoking rooms",
-        "Room service",
-        "24-hour front desk",
-        "Facilities for disabled guests",
-        "Laundry",
-        "Breakfast"
-      ],
-      "great_for_your_stay": [
-        "Private bathroom",
-        "Parking",
-        "Air conditioning",
-        "View",
-        "Free WiFi",
-        "Terrace",
-        "Family rooms",
-        "Room service",
-        "Flat-screen TV",
-        "Airport shuttle"
-      ],
-      "bathroom": [
-        "Toilet paper",
-        "Towels",
-        "Bidet",
-        "Slippers",
-        "Private bathroom",
-        "Toilet",
-        "Free toiletries",
-        "Hairdryer",
-        "Shower"
-      ],
-      "bedroom": [
-        "Linen",
-        "Wardrobe or closet"
-      ],
-      "view": [
-        "City view",
-        "View"
-      ],
-      "outdoors": [
-        "Outdoor furniture",
-        "Terrace"
-      ],
-      "kitchen": [
-        "Electric kettle",
-        "Refrigerator"
-      ],
-      "room_amenities": [
-        "Socket near the bed",
-        "Clothes rack"
-      ],
-      "living_area": [
-        "Desk"
-      ],
-      "internet": {
-        "wifi_available": true,
-        "wifi_areas": "All areas",
-        "wifi_cost": "Free of charge"
+    "hotel": {
+      "name": "Wandr Indiranagar, Bangalore",
+      "address": {
+        "street": "3363 No. 3363, 2nd cross road, HAL 2nd stage, Indiranagar",
+        "city": "Bangalore",
+        "pincode": "560038",
+        "state": "Karnataka",
+        "country": "India"
       },
-      "parking": {
-        "available": true,
-        "type": "Free private parking on site",
-        "reservation_needed": false,
-        "parking_garage": true,
-        "accessible_parking": true,
-        "capacity": "At least 2 cars inside the property"
-      },
-      "reception_services": [
-        "Invoice provided",
-        "Private check-in/check-out",
-        "Concierge service",
-        "Luggage storage",
-        "Express check-in/check-out",
-        "24-hour front desk"
-      ],
-      "family_friendly": [
-        "Family rooms",
-        "Flat-screen TV"
-      ],
-      "cleaning_services": {
-        "daily_housekeeping": true,
-        "guest_room_cleaning": true,
-        "common_area_cleaning": true,
-        "disinfectant_cleaning": true,
-        "employees_trained_for_cleaning": true,
-        "trouser_press": {
-          "available": true,
-          "additional_charge": true
-        },
-        "ironing_service": {
-          "available": true,
-          "additional_charge": true
-        },
-        "dry_cleaning": {
-          "available": true,
-          "additional_charge": true
-        },
-        "laundry": {
-          "available": true,
-          "additional_charge": true
+      "location_tag": "Excellent location",
+      "distance_from_city_center_km": 4.7,
+      "distance_from_airport_km": 33,
+      "ratings": {
+        "overall_score": 8.3,
+        "overall_label": "Very Good",
+        "total_reviews": 250,
+        "location_score": 9.4,
+        "couples_rating": 9.3,
+        "category_scores": {
+          "staff": 8.9,
+          "facilities": 8.3,
+          "cleanliness": 8.7,
+          "comfort": 8.7,
+          "value_for_money": 8.6,
+          "location": 9.4,
+          "free_wifi": 8.0
         }
       },
-      "safety_and_security": [
-        "Fire extinguishers",
+      "description": {
+        "comfortable_accommodations": "Wandr Indiranagar in Bangalore offers family rooms with air-conditioning, private bathrooms, and city views. Each room includes a work desk, TV, and free toiletries.",
+        "essential_facilities": "Guests enjoy free WiFi, a terrace, and private check-in and check-out services. Additional amenities include a 24-hour front desk, concierge, and free on-site parking.",
+        "dining_options": "A variety of breakfast options are available, including continental, American, buffet, à la carte, vegetarian, and Asian. Breakfast includes juice and pancakes.",
+        "local_attractions": "Located 4.7 km from The Heritage Centre & Aerospace Museum and 38 km from Kempegowda International Airport, the hotel is close to Brigade Road and Commercial Street.",
+        "popular_with_families": true,
+        "couple_friendly": true
+      },
+      "amenities": [
+        "WiFi",
         "Fire alarm",
-        "Security camera",
-        "CCTV outside property",
-        "CCTV in common areas",
-        "Smoke alarms",
-        "Security alarm",
-        "Key card access",
-        "Key access",
-        "24-hour security"
-      ],
-      "general": [
-        "Designated smoking area",
-        "Air conditioning",
-        "Non-smoking throughout",
-        "Tile/marble floor",
-        "Private entrance",
-        "Carpeted",
-        "Lift / Elevator",
-        "Fan",
-        "Ironing facilities",
-        "Facilities for disabled guests",
-        "Pants press",
-        "Non-smoking rooms",
-        "Room service",
-        "Coffee machine",
-        "Seating area",
-        "24h lobby"
-      ],
-      "airport_shuttle": {
-        "available": true,
-        "additional_charge": true,
-        "request": "Directly after booking"
-      },
-      "accessibility": [
-        "Wheelchair accessible",
-        "Wheelchair friendly",
-        "Upper floors accessible by elevator"
-      ],
-      "languages_spoken": [
-        "English",
-        "Hindi",
-        "Kannada",
-        "Malayalam",
-        "Tamil",
-        "Telugu"
-      ],
-      "swimming_pool": false,
-      "fitness_center": false,
-      "restaurant_onsite": true,
-      "restaurant_note": "Serves breakfast, lunch, and dinner"
-    },
-    "rooms": [
-      {
-        "room_type": "Deluxe Queen Room",
-        "recommended": true,
-        "bed_type": "Queen Size",
-        "availability_status": "Available",
-        "total_photos": 5,
-        "amenities": [
-          "AC",
-          "Shower",
-          "TV",
-          "Electric Kettle",
-          "In room Dining",
-          "Couple Friendly",
-          "Toiletries",
-          "Parking",
-          "No Smoking",
-          "Family Hotel",
-          "Concierge",
-          "Laundry Services"
-        ],
-        "pricing": [
-          {
-            "plan": "Room Only",
-            "original_price_INR": 5208,
-            "discount_INR": 2448,
-            "price_per_night_INR": 2760,
-            "price_note": "Plus taxes, Price for 2 Guests",
-            "refund_policy": "Available",
-            "additional_discount_on_login": true
-          },
-          {
-            "plan": "Room with Breakfast",
-            "original_price_INR": 5963,
-            "discount_INR": 2803,
-            "price_per_night_INR": 3160,
-            "price_note": "Plus taxes, Price for 2 Guests",
-            "refund_policy": "Available",
-            "additional_discount_on_login": true
-          }
-        ]
-      },
-      {
-        "room_type": "Deluxe Twin Room",
-        "recommended": false,
-        "bed_type": "Twin Beds",
-        "availability_status": "Limited - 1 Room left",
-        "total_photos": 7,
-        "amenities": [
-          "AC",
-          "Shower",
-          "TV",
-          "Electric Kettle",
-          "In room Dining",
-          "Couple Friendly",
-          "Toiletries",
-          "Parking",
-          "No Smoking",
-          "Family Hotel",
-          "Concierge",
-          "Laundry Services"
-        ],
-        "pricing": [
-          {
-            "plan": "Room Only",
-            "original_price_INR": 5611,
-            "discount_INR": 2637,
-            "price_per_night_INR": 2974,
-            "price_note": "Plus taxes, Price for 2 Guests",
-            "refund_policy": "Available",
-            "additional_discount_on_login": true
-          },
-          {
-            "plan": "Room with Breakfast",
-            "original_price_INR": 6011,
-            "discount_INR": 2825,
-            "price_per_night_INR": 3186,
-            "price_note": "Plus taxes, Price for 2 Guests",
-            "refund_policy": "Available",
-            "additional_discount_on_login": true
-          }
-        ]
-      },
-      {
-        "room_type": "Queen Room With Balcony",
-        "recommended": false,
-        "bed_type": "Queen Size",
-        "availability_status": "Sold Out",
-        "total_photos": 5,
-        "amenities": [
-          "AC",
-          "TV",
-          "Shower",
-          "Balcony",
-          "Electric Kettle",
-          "Couple Friendly",
-          "In room Dining",
-          "Toiletries",
-          "Parking",
-          "No Smoking",
-          "Laundry Services",
-          "Concierge",
-          "Family Hotel"
-        ],
-        "pricing": []
-      },
-      {
-        "room_type": "Twin Room With Balcony",
-        "recommended": false,
-        "bed_type": "Twin Beds",
-        "availability_status": "Sold Out",
-        "total_photos": 8,
-        "amenities": [
-          "AC",
-          "TV",
-          "Shower",
-          "Balcony",
-          "Couple Friendly",
-          "In room Dining",
-          "Electric Kettle",
-          "Toiletries",
-          "Parking",
-          "No Smoking",
-          "Laundry Services",
-          "Concierge",
-          "Family Hotel"
-        ],
-        "pricing": []
-      }
-    ],
-    "breakfast": {
-      "available": true,
-      "options": [
-        "Continental",
-        "Vegetarian",
-        "Asian",
-        "American",
+        "Security Camera",
+        "Fire extinguishers",
+        "Laundry",
         "Buffet",
-        "À la carte"
+        "Free parking",
+        "Common Area Cleaning",
+        "Coffee Machine",
+        "Wheelchair friendly",
+        "Elevator",
+        "24h lobby",
+        "Seating area",
+        "Credit Card",
+        "Breakfast Buffet",
+        "Guest Room Cleaning",
+        "Disinfectant Cleaning",
+        "Restaurant/cafe",
+        "Security",
+        "Parking",
+        "Couple Friendly",
+        "Debit Card",
+        "Breakfast Available",
+        "Daily House Keeping",
+        "Employees Trained For Cleaning"
       ],
-      "includes": [
-        "Juice",
-        "Pancakes"
+      "facilities": {
+        "most_popular": [
+          "Free WiFi",
+          "Airport shuttle",
+          "Family rooms",
+          "Free parking",
+          "Non-smoking rooms",
+          "Room service",
+          "24-hour front desk",
+          "Facilities for disabled guests",
+          "Laundry",
+          "Breakfast"
+        ],
+        "great_for_your_stay": [
+          "Private bathroom",
+          "Parking",
+          "Air conditioning",
+          "View",
+          "Free WiFi",
+          "Terrace",
+          "Family rooms",
+          "Room service",
+          "Flat-screen TV",
+          "Airport shuttle"
+        ],
+        "bathroom": [
+          "Toilet paper",
+          "Towels",
+          "Bidet",
+          "Slippers",
+          "Private bathroom",
+          "Toilet",
+          "Free toiletries",
+          "Hairdryer",
+          "Shower"
+        ],
+        "bedroom": [
+          "Linen",
+          "Wardrobe or closet"
+        ],
+        "view": [
+          "City view",
+          "View"
+        ],
+        "outdoors": [
+          "Outdoor furniture",
+          "Terrace"
+        ],
+        "kitchen": [
+          "Electric kettle",
+          "Refrigerator"
+        ],
+        "room_amenities": [
+          "Socket near the bed",
+          "Clothes rack"
+        ],
+        "living_area": [
+          "Desk"
+        ],
+        "internet": {
+          "wifi_available": true,
+          "wifi_areas": "All areas",
+          "wifi_cost": "Free of charge"
+        },
+        "parking": {
+          "available": true,
+          "type": "Free private parking on site",
+          "reservation_needed": false,
+          "parking_garage": true,
+          "accessible_parking": true,
+          "capacity": "At least 2 cars inside the property"
+        },
+        "reception_services": [
+          "Invoice provided",
+          "Private check-in/check-out",
+          "Concierge service",
+          "Luggage storage",
+          "Express check-in/check-out",
+          "24-hour front desk"
+        ],
+        "family_friendly": [
+          "Family rooms",
+          "Flat-screen TV"
+        ],
+        "cleaning_services": {
+          "daily_housekeeping": true,
+          "guest_room_cleaning": true,
+          "common_area_cleaning": true,
+          "disinfectant_cleaning": true,
+          "employees_trained_for_cleaning": true,
+          "trouser_press": {
+            "available": true,
+            "additional_charge": true
+          },
+          "ironing_service": {
+            "available": true,
+            "additional_charge": true
+          },
+          "dry_cleaning": {
+            "available": true,
+            "additional_charge": true
+          },
+          "laundry": {
+            "available": true,
+            "additional_charge": true
+          }
+        },
+        "safety_and_security": [
+          "Fire extinguishers",
+          "Fire alarm",
+          "Security camera",
+          "CCTV outside property",
+          "CCTV in common areas",
+          "Smoke alarms",
+          "Security alarm",
+          "Key card access",
+          "Key access",
+          "24-hour security"
+        ],
+        "general": [
+          "Designated smoking area",
+          "Air conditioning",
+          "Non-smoking throughout",
+          "Tile/marble floor",
+          "Private entrance",
+          "Carpeted",
+          "Lift / Elevator",
+          "Fan",
+          "Ironing facilities",
+          "Facilities for disabled guests",
+          "Pants press",
+          "Non-smoking rooms",
+          "Room service",
+          "Coffee machine",
+          "Seating area",
+          "24h lobby"
+        ],
+        "airport_shuttle": {
+          "available": true,
+          "additional_charge": true,
+          "request": "Directly after booking"
+        },
+        "accessibility": [
+          "Wheelchair accessible",
+          "Wheelchair friendly",
+          "Upper floors accessible by elevator"
+        ],
+        "languages_spoken": [
+          "English",
+          "Hindi",
+          "Kannada",
+          "Malayalam",
+          "Tamil",
+          "Telugu"
+        ],
+        "swimming_pool": false,
+        "fitness_center": false,
+        "restaurant_onsite": true,
+        "restaurant_note": "Serves breakfast, lunch, and dinner"
+      },
+      "rooms": [
+        {
+          "room_type": "Deluxe Queen Room",
+          "recommended": true,
+          "bed_type": "Queen Size",
+          "availability_status": "Available",
+          "total_photos": 5,
+          "amenities": [
+            "AC",
+            "Shower",
+            "TV",
+            "Electric Kettle",
+            "In room Dining",
+            "Couple Friendly",
+            "Toiletries",
+            "Parking",
+            "No Smoking",
+            "Family Hotel",
+            "Concierge",
+            "Laundry Services"
+          ],
+          "pricing": [
+            {
+              "plan": "Room Only",
+              "original_price_INR": 5208,
+              "discount_INR": 2448,
+              "price_per_night_INR": 2760,
+              "price_note": "Plus taxes, Price for 2 Guests",
+              "refund_policy": "Available",
+              "additional_discount_on_login": true
+            },
+            {
+              "plan": "Room with Breakfast",
+              "original_price_INR": 5963,
+              "discount_INR": 2803,
+              "price_per_night_INR": 3160,
+              "price_note": "Plus taxes, Price for 2 Guests",
+              "refund_policy": "Available",
+              "additional_discount_on_login": true
+            }
+          ]
+        },
+        {
+          "room_type": "Deluxe Twin Room",
+          "recommended": false,
+          "bed_type": "Twin Beds",
+          "availability_status": "Limited - 1 Room left",
+          "total_photos": 7,
+          "amenities": [
+            "AC",
+            "Shower",
+            "TV",
+            "Electric Kettle",
+            "In room Dining",
+            "Couple Friendly",
+            "Toiletries",
+            "Parking",
+            "No Smoking",
+            "Family Hotel",
+            "Concierge",
+            "Laundry Services"
+          ],
+          "pricing": [
+            {
+              "plan": "Room Only",
+              "original_price_INR": 5611,
+              "discount_INR": 2637,
+              "price_per_night_INR": 2974,
+              "price_note": "Plus taxes, Price for 2 Guests",
+              "refund_policy": "Available",
+              "additional_discount_on_login": true
+            },
+            {
+              "plan": "Room with Breakfast",
+              "original_price_INR": 6011,
+              "discount_INR": 2825,
+              "price_per_night_INR": 3186,
+              "price_note": "Plus taxes, Price for 2 Guests",
+              "refund_policy": "Available",
+              "additional_discount_on_login": true
+            }
+          ]
+        },
+        {
+          "room_type": "Queen Room With Balcony",
+          "recommended": false,
+          "bed_type": "Queen Size",
+          "availability_status": "Sold Out",
+          "total_photos": 5,
+          "amenities": [
+            "AC",
+            "TV",
+            "Shower",
+            "Balcony",
+            "Electric Kettle",
+            "Couple Friendly",
+            "In room Dining",
+            "Toiletries",
+            "Parking",
+            "No Smoking",
+            "Laundry Services",
+            "Concierge",
+            "Family Hotel"
+          ],
+          "pricing": []
+        },
+        {
+          "room_type": "Twin Room With Balcony",
+          "recommended": false,
+          "bed_type": "Twin Beds",
+          "availability_status": "Sold Out",
+          "total_photos": 8,
+          "amenities": [
+            "AC",
+            "TV",
+            "Shower",
+            "Balcony",
+            "Couple Friendly",
+            "In room Dining",
+            "Electric Kettle",
+            "Toiletries",
+            "Parking",
+            "No Smoking",
+            "Laundry Services",
+            "Concierge",
+            "Family Hotel"
+          ],
+          "pricing": []
+        }
       ],
-      "guest_review_score": 7.5,
-      "meal_periods": [
-        "Breakfast",
-        "Lunch",
-        "Dinner"
-      ]
+      "breakfast": {
+        "available": true,
+        "options": [
+          "Continental",
+          "Vegetarian",
+          "Asian",
+          "American",
+          "Buffet",
+          "À la carte"
+        ],
+        "includes": [
+          "Juice",
+          "Pancakes"
+        ],
+        "guest_review_score": 7.5,
+        "meal_periods": [
+          "Breakfast",
+          "Lunch",
+          "Dinner"
+        ]
+      },
+      "house_rules": {
+        "check_in": {
+          "from": "13:00",
+          "early_check_in": "Subject to availability, at additional cost",
+          "note": "Advance notice of arrival time required"
+        },
+        "check_out": {
+          "until": "11:00",
+          "late_check_out": "Subject to availability"
+        },
+        "cancellation_prepayment": "Varies according to accommodation type",
+        "children_policy": {
+          "children_welcome": true,
+          "children_charged_as_adults_age": 13,
+          "cribs_available": false,
+          "extra_bed": {
+            "available": true,
+            "on_request": true,
+            "price_per_person_per_night_INR": 1500,
+            "subject_to_availability": true,
+            "included_in_total_price": false
+          }
+        },
+        "age_restriction": {
+          "minimum_check_in_age": 18,
+          "under_18_with_guardian": true
+        },
+        "pets": {
+          "allowed": false
+        },
+        "smoking": {
+          "allowed": false,
+          "designated_smoking_area": true
+        },
+        "couples": {
+          "unmarried_couples_allowed": true,
+          "couple_friendly": true
+        },
+        "id_requirements": {
+          "government_id_required": true,
+          "local_id_allowed": true,
+          "foreigners_allowed": true
+        },
+        "visitors": {
+          "allowed": true
+        },
+        "outside_food_beverage": {
+          "allowed": true
+        },
+        "parties_events": {
+          "allowed": false,
+          "note": "No bachelor/bachelorette or similar parties"
+        },
+        "groups": {
+          "note": "When booking more than 6 rooms, different policies and additional supplements may apply"
+        },
+        "special_deals_packages": {
+          "available": true,
+          "note": "Can be found on website or by speaking with reservation team"
+        }
+      },
+      "payment_methods": [
+        "American Express",
+        "Visa",
+        "Mastercard",
+        "JCB",
+        "Maestro",
+        "Discover",
+        "UnionPay",
+        "Credit Card",
+        "Debit Card",
+        "Cash"
+      ],
+      "nearby_places": [
+        {
+          "name": "Hwarang Thai Spa - Best Thai Spa in Indiranagar",
+          "distance_km": 0.44
+        },
+        {
+          "name": "Dogloo Water Tank",
+          "distance_km": 0.54
+        },
+        {
+          "name": "Rapid Cabs India Pvt Ltd",
+          "distance_km": 0.58
+        },
+        {
+          "name": "MAD MEN",
+          "distance_km": 0.69
+        },
+        {
+          "name": "Defence Colony Children's Park",
+          "distance_km": 0.77
+        },
+        {
+          "name": "Shri Krishna Swamy Temple",
+          "distance_km": 1.16
+        },
+        {
+          "name": "Shri Chokkanatha Swamy Temple",
+          "distance_km": 1.26
+        }
+      ],
+      "area_info": {
+        "guests_enjoyed_area_for": [
+          "Food and drinks",
+          "Shopping",
+          "Entertainment and nightlife"
+        ],
+        "top_attractions": [
+          {
+            "name": "The Heritage Centre & Aerospace Museum",
+            "distance_km": 4.7
+          },
+          {
+            "name": "Bangalore Aquarium",
+            "distance_km": 5
+          },
+          {
+            "name": "Visvesvaraya Industrial and Technological Museum",
+            "distance_km": 6
+          },
+          {
+            "name": "Cubbon Park",
+            "distance_km": 6
+          },
+          {
+            "name": "Indira Gandhi Musical Fountain Park",
+            "distance_km": 7
+          },
+          {
+            "name": "National Gallery of Modern Art",
+            "distance_km": 7
+          },
+          {
+            "name": "Freedom Park",
+            "distance_km": 8
+          },
+          {
+            "name": "Bangalore Palace",
+            "distance_km": 8
+          },
+          {
+            "name": "Lal Bagh Botanical Garden",
+            "distance_km": 8
+          },
+          {
+            "name": "Tipu Sultan's Summer Palace",
+            "distance_km": 9
+          }
+        ],
+        "restaurants_and_cafes": [
+          {
+            "name": "Chianti",
+            "type": "Restaurant",
+            "distance_m": 200
+          },
+          {
+            "name": "Bombay Brasserie",
+            "type": "Restaurant",
+            "distance_m": 300
+          },
+          {
+            "name": "Glocal Junction Indiranagar",
+            "type": "Cafe/Bar",
+            "distance_m": 300
+          }
+        ],
+        "natural_beauty": [
+          {
+            "name": "Ulsoor Lake",
+            "type": "Lake",
+            "distance_km": 4.9
+          },
+          {
+            "name": "Makkalokoota Park",
+            "type": "Waterfall",
+            "distance_km": 9
+          }
+        ],
+        "public_transit": [
+          {
+            "name": "Indiranagar",
+            "type": "Subway",
+            "distance_km": 1.7
+          },
+          {
+            "name": "Swami Vivekananda Road",
+            "type": "Subway",
+            "distance_km": 2.4
+          },
+          {
+            "name": "Baiyyappanahalli Junction",
+            "type": "Train",
+            "distance_km": 3.3
+          },
+          {
+            "name": "Shivajinagar Bus Station",
+            "type": "Bus",
+            "distance_km": 5
+          },
+          {
+            "name": "Banaswadi",
+            "type": "Train",
+            "distance_km": 6
+          },
+          {
+            "name": "Kempegowda Bus Terminal",
+            "type": "Bus",
+            "distance_km": 9
+          }
+        ],
+        "closest_airports": [
+          {
+            "name": "Kempegowda International Airport",
+            "distance_km": 33
+          }
+        ]
+      },
+      "guest_reviews": [
+        {
+          "reviewer": "S",
+          "country": "India",
+          "room_type": "Deluxe Queen Room",
+          "stay_duration": "6 nights",
+          "stay_month": "March 2026",
+          "traveler_type": "Couple",
+          "review_date": "2026-03-23",
+          "rating": 9.0,
+          "rating_label": "Excellent",
+          "positive": "Clean, aesthetic and comfortable",
+          "negative": null,
+          "hotel_response": "Dear Guest, Thank you for your kind words! We're delighted to hear that you found the hotel clean, aesthetic, and comfortable. We look forward to welcoming you again soon. Kind regards, Team Wandr."
+        },
+        {
+          "reviewer": "Peter",
+          "country": "United Kingdom",
+          "room_type": "Queen Room with Balcony",
+          "stay_duration": "2 nights",
+          "stay_month": "March 2026",
+          "traveler_type": "Couple",
+          "review_date": "2026-03-19",
+          "rating": 9.0,
+          "rating_label": "Wonderful",
+          "positive": "Fantastic location. Comfortable beds, plenty of storage.",
+          "negative": "Going home",
+          "hotel_response": "Dear Guest, Thank you for your wonderful review. We look forward to welcoming you again for another memorable stay. Thanks and Regards, Team Wandr."
+        },
+        {
+          "reviewer": "Balan",
+          "country": "India",
+          "room_type": "Deluxe Queen Room",
+          "stay_duration": "2 nights",
+          "stay_month": "February 2026",
+          "traveler_type": "Group",
+          "review_date": "2026-03-03",
+          "rating": 9.0,
+          "rating_label": "Stay was good. Location very close to my work area. Overall satisfied",
+          "positive": "Good",
+          "negative": "Not much",
+          "hotel_response": "Dear Mr. Balan, Thank you for sharing your valuable feedback. We are pleased to know that you had a good stay and that our location was convenient for your work. We look forward to welcoming you again."
+        },
+        {
+          "reviewer": "Sanjay",
+          "country": "India",
+          "room_type": "Deluxe Queen Room",
+          "stay_duration": "1 night",
+          "stay_month": "March 2026",
+          "traveler_type": "Group",
+          "review_date": "2026-03-02",
+          "rating": 8.0,
+          "rating_label": "Very Good",
+          "positive": "Location is very good. Just in 5 min you get to 12th main which has all the restaurants and bars. 100 feet road is 10 min away by walk.",
+          "negative": "Never seen such small 'Deluxe' bedroom.",
+          "hotel_response": "Dear Mr. Sanjay, We regret that the deluxe room size did not meet your expectations. Your feedback is important to us. We look forward to welcoming you again."
+        },
+        {
+          "reviewer": "Tatiana",
+          "country": "Austria",
+          "room_type": "Deluxe Queen Room",
+          "stay_duration": "5 nights",
+          "stay_month": "February 2026",
+          "traveler_type": "Solo traveler",
+          "review_date": "2026-02-28",
+          "rating": 8.0,
+          "rating_label": "Very Good",
+          "positive": "The staff was very friendly and the location is fantastic. On a quiet spot, but close to all the nice places of Indiranagar.",
+          "negative": "The water bottles were very small and I would have appreciated a way to fill my water bottle without generating so much garbage.",
+          "hotel_response": "Thank you for your valuable feedback Ms. Tatiana. We will look into more sustainable solutions. We look forward to welcoming you again soon."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "What kind of breakfast is served at Wandr Indiranagar, Bangalore?",
+          "answer": "Guests can enjoy a highly-rated breakfast. Options include Continental, Vegetarian, Asian, American, Buffet, and À la carte."
+        },
+        {
+          "question": "What type of room can I book at Wandr Indiranagar, Bangalore?",
+          "answer": "Room options include Double, Twin, standard rooms, deluxe rooms, suites, and family rooms."
+        },
+        {
+          "question": "How much does it cost to stay at Wandr Indiranagar, Bangalore?",
+          "answer": "Prices vary depending on stay dates and hotel policy. Enter your dates to see current prices."
+        },
+        {
+          "question": "How far is Wandr Indiranagar, Bangalore from the center of Bangalore?",
+          "answer": "4.7 km from the center of Bangalore."
+        },
+        {
+          "question": "Is Wandr Indiranagar, Bangalore popular with families?",
+          "answer": "Yes, it is popular with guests booking family stays."
+        },
+        {
+          "question": "What are the check-in and check-out times?",
+          "answer": "Check-in from 13:00 (1:00 PM), check-out until 11:00 AM."
+        },
+        {
+          "question": "Do they serve breakfast?",
+          "answer": "Select your dates, then view the list of available rooms to see if breakfast options are available."
+        },
+        {
+          "question": "Is there an airport shuttle service?",
+          "answer": "Yes, airport shuttle is available for an additional fee. Request it directly after booking."
+        },
+        {
+          "question": "Is there a restaurant?",
+          "answer": "Yes, there is a restaurant on-site that serves breakfast, lunch, and dinner."
+        },
+        {
+          "question": "Can I park there?",
+          "answer": "Free private parking is available on site. Reservation is not needed. At least two cars can be parked inside the property."
+        },
+        {
+          "question": "Are there rooms with a private bathroom?",
+          "answer": "Yes, rooms with a private bathroom are available. Select your dates to confirm availability."
+        },
+        {
+          "question": "Is there a swimming pool?",
+          "answer": "No, Wandr Indiranagar, Bangalore does not have a swimming pool."
+        },
+        {
+          "question": "Is there a fitness center?",
+          "answer": "No, there is no pool or fitness center on site."
+        },
+        {
+          "question": "Are there rooms with a balcony?",
+          "answer": "Yes, rooms with a balcony are available. Select your dates to confirm availability."
+        },
+        {
+          "question": "What's the Wi-Fi policy?",
+          "answer": "WiFi is available in all areas and is free of charge."
+        },
+        {
+          "question": "Are you couple friendly?",
+          "answer": "Yes, all guests are welcome as long as they have valid ID cards. Unmarried couples are allowed."
+        },
+        {
+          "question": "Do you allow early check-in or late check-out?",
+          "answer": "Subject to availability, early check-in and late check-out can be accommodated at additional cost. If rooms are unavailable, guests are welcome to use the common areas."
+        },
+        {
+          "question": "Are there any special deals or packages available?",
+          "answer": "Yes, special deals and packages can be found on the website or by speaking with the reservation team."
+        },
+        {
+          "question": "Are pets allowed?",
+          "answer": "No, pets are not allowed."
+        }
+      ],
+      "fine_print": [
+        "Please inform Wandr Indiranagar, Bangalore of your expected arrival time in advance.",
+        "This property does not accommodate bachelor(ette) or similar parties.",
+        "Guests under the age of 18 can only check in with a parent or official guardian.",
+        "Outside food and beverages are allowed.",
+        "Local IDs are accepted.",
+        "Foreigners are allowed.",
+        "Visitors are allowed."
+      ],
+      "contact": {
+        "phone": "Not available — please check wandrhotels.com",
+        "email": "Not available — please check wandrhotels.com",
+        "website": "wandrhotels.com",
+        "address_full": "3363 No. 3363, 2nd cross road, HAL 2nd stage, Indiranagar, Bangalore - 560038, Karnataka, India"
+      },
+      "property_master": {
+        "property_type": "Boutique Hotel",
+        "year_opened": 2025,
+        "last_renovated": 2025,
+        "number_of_floors": 2,
+        "total_rooms": 18,
+        "geo_coordinates": {
+          "latitude": 12.9734,
+          "longitude": 77.6412
+        },
+        "google_maps_url": "https://maps.app.goo.gl/MhG3LfojHpw1Hyj1A?g_st=aw",
+        "landmarks": [
+          "Indiranagar 100 Feet Road",
+          "Indiranagar Metro Station",
+          "Indiranagar Methodist Church",
+          "Toit Brewery"
+        ],
+        "power_backup": true,
+        "ev_charging": false,
+        "valet_parking": false
+      },
+      "location_intelligence": {
+        "nearest_hospital": [
+          "Axon Speciality Hospital (6th Main Road)",
+          "Chinmaya Mission Hospital (CMH Road)",
+          "Manipal Hospital (Old Airport Road)",
+          "Lohitha Hospital (16th E Main Road)"
+        ],
+        "nearest_pharmacy": [
+          "S.S Medicals (12th Main Road)",
+          "Apollo Pharmacy (18th Main Road)",
+          "Revive Pharma 24/7 (Paramahansa Yogananda Road)",
+          "Prakash Medicals (80 Feet Road)"
+        ],
+        "nearest_atm": [
+          "HDFC Bank ATM (100 Feet Road)",
+          "ICICI Bank ATM (12th Main Road)",
+          "State Bank of India ATM (CMH Road)",
+          "Axis Bank ATM (HAL 2nd Stage)"
+        ],
+        "nearest_grocery_store": [
+          "Ratnadeep Supermarket (12th Main Road)",
+          "Simpli Namdhari's (7th Cross Road)",
+          "MK Retail Supermarket (CMH Road)",
+          "Organic Mandya (9th A Main Road)"
+        ],
+        "nearest_petrol_bunk": [
+          "Indian Oil Corporation Junction (Old Airport Rd)",
+          "HP Fuel Station (Indiranagar 100 Feet Rd)",
+          "Bharat Petroleum (Domlur Flyover Lounge)",
+          "Shell Fuel Station (Old Madras Road)"
+        ],
+        "nearest_police_station": [
+          "Indiranagar Traffic Police Station",
+          "Indiranagar Law & Order Police Station",
+          "Jeevan Bima Nagar Police Station",
+          "Domlur Police Outpost"
+        ],
+        "safe_at_night": [
+          "Highly secure due to active nightlife",
+          "Regular police patrol vehicles passing by",
+          "Bright streetlights across commercial roads",
+          "Active street crowd presence until midnight"
+        ],
+        "noise_level": [
+          "Low inside individual hotel rooms",
+          "Medium on secondary neighborhood roads",
+          "High near main party pubs on weekends",
+          "Low during standard morning hours"
+        ],
+        "cab_accessibility": [
+          "Immediate Uber and Ola driver matching",
+          "Rapido bike taxi pickups under two minutes",
+          "Namma Yatri auto rickshaws easily available",
+          "Ample space for roadside vehicle boarding"
+        ],
+        "traffic_level": [
+          "Low during early morning hours",
+          "Moderate during standard afternoon hours",
+          "High during corporate peak office checkout times",
+          "Heavy congestion near 100 Feet Road intersections"
+        ],
+        "railway_station_distance_km": [
+          "7.8 km to KSR Bengaluru City Station",
+          "6.2 km to Cantonment Railway Station",
+          "5.5 km to Krishnarajapuram Railway Station",
+          "11.5 km to Yesvantpur Junction Station"
+        ],
+        "airport_travel_time_minutes": [
+          "65 minutes using a standard taxi route",
+          "50 minutes during early morning hours",
+          "90 minutes during heavy evening traffic blocks",
+          "75 minutes riding the KIA-76 Volvo airport bus"
+        ]
+      },
+      "room_specs": {
+        "room_size_sqft": {
+          "deluxe_twin_room": 205,
+          "deluxe_queen_room": 215,
+          "deluxe_double_room": 237,
+          "queen_room_with_balcony": 258,
+          "twin_room_with_balcony": 258
+        },
+        "bed_dimensions": {
+          "queen_bed": "60 x 78 inches",
+          "single_bed": "36 x 75 inches"
+        },
+        "mattress_type": "Hypoallergenic Bedding",
+        "hot_water_availability": "24-hour hot & cold water",
+        "blackout_curtains": true,
+        "charging_ports_per_room": "Multiple bedside and desk sockets",
+        "workspace_friendly": true,
+        "smart_tv": true
+      },
+      "digital_experience": {
+        "mobile_check_in": true,
+        "digital_check_out": true,
+        "online_kyc": true,
+        "whatsapp_concierge": true,
+        "digital_room_key": null,
+        "qr_room_service": true,
+        "wifi_speed_mbps": 100,
+        "backup_internet_provider": "Airtel Fiber"
+      },
+      "food_and_dining_details": {
+        "breakfast_timings": "08:00 AM - 10:30 AM",
+        "breakfast_type": "South Indian Veg & Non-Veg (Sourced outside/Buffet/À la carte)",
+        "room_service_timings": "24 Hours",
+        "late_night_food_available": true,
+        "jain_food_available": null,
+        "vegan_food_available": null,
+        "gluten_free_options": null,
+        "kids_meals_available": null,
+        "complimentary_tea_coffee": true,
+        "outside_delivery_apps_allowed": true
+      },
+      "cleaning_hygiene": {
+        "room_cleaning_frequency": "Daily",
+        "linen_change_frequency": "On request / Alternate days",
+        "sanitization_process": "Standard hospitality deep cleaning protocol between guest stays",
+        "eco_friendly_toiletries": null,
+        "ro_drinking_water": true
+      },
+      "safety_emergency": {
+        "doctor_on_call": true,
+        "first_aid_kit_available": true,
+        "fire_exit_map_in_rooms": true,
+        "emergency_contact_process": "24/7 front desk helpline via WhatsApp and intercom",
+        "female_traveler_safety_rating": "Excellent"
+      },
+      "billing_details": {
+        "upi_accepted": true,
+        "security_deposit": null,
+        "refund_timeline_days": 7,
+        "split_payment_supported": true,
+        "corporate_billing_available": true,
+        "gst_breakdown": {
+          "cgst_percentage": 6.0,
+          "sgst_percentage": 6.0,
+          "total_gst_percentage": 12.0
+        }
+      },
+      "booking_operations": {
+        "walk_in_guests_allowed": true,
+        "tentative_booking_available": false,
+        "tentative_booking_hold_duration": null,
+        "booking_modification_policy": "Modifications allowed subject to rate differences and room availability per platform rules",
+        "no_show_policy": "Attracts full cost of the scheduled stay or full first-night penalty charge"
+      },
+      "guest_personalization": {
+        "loyalty_program": null,
+        "reward_points_supported": null,
+        "returning_guest_discount": null,
+        "room_upgrade_policy": "Subject to availability upon arrival, typically applicable during low-occupancy windows",
+        "saved_guest_preferences": null
+      },
+      "event_services": {
+        "birthday_decorations": "Allowed via third-party vendors (In-house staff setups not provided)",
+        "anniversary_setup": "Allowed via third-party vendors (In-house staff setups not provided)",
+        "honeymoon_setup": null,
+        "cake_arrangement": "Can be arranged externally via Swiggy/Zomato delivery apps",
+        "flower_bouquet_arrangement": null,
+        "private_dining": null,
+        "local_tours_arranged": null
+      },
+      "business_traveler_features": {
+        "printing_service": "Available at the front reception desk on request",
+        "scanning_service": "Available at the front reception desk on request",
+        "coworking_space": null,
+        "meeting_room_available": null,
+        "weekly_rates_available": "Subject to custom seasonal corporate quotes via team outreach",
+        "monthly_stay_discount": "Subject to custom seasonal corporate quotes via team outreach"
+      },
+      "ai_metadata": {
+        "faq_intents": [
+          "ask_total_floors",
+          "ask_property_type",
+          "ask_year_opened",
+          "ask_location_coordinates",
+          "ask_nearest_hospital",
+          "ask_wifi_speed",
+          "ask_outside_food_policy",
+          "ask_third_party_decoration"
+        ],
+        "search_keywords": [
+          "Wandr Indiranagar Bangalore",
+          "Boutique hotel near 100 Feet Road",
+          "Wandr Hotels Bengaluru booking",
+          "Budget corporate stay Indiranagar",
+          "Hotels near Indiranagar Metro Station",
+          "Wandr Indiranagar balcony rooms"
+        ],
+        "review_topics": [
+          "Room cleanliness and modern decor",
+          "Proximity to Indiranagar pubs and cafes",
+          "High-speed Wi-Fi performance for work",
+          "Helpful reception and front desk staff",
+          "Outside food delivery convenience",
+          "Quietness inside residential cross-lanes"
+        ],
+        "semantic_tags": [
+          "hospitality:hotel:boutique",
+          "geo:india:bengaluru:indiranagar",
+          "traveler:corporate:solo",
+          "amenity:workspace_friendly",
+          "policy:outside_food_allowed",
+          "infrastructure:low_rise"
+        ]
+      }
     },
     "house_rules": {
       "check_in": {
-        "from": "13:00",
-        "early_check_in": "Subject to availability, at additional cost",
-        "note": "Advance notice of arrival time required"
+        "from": "23"
       },
       "check_out": {
-        "until": "11:00",
-        "late_check_out": "Subject to availability"
-      },
-      "cancellation_prepayment": "Varies according to accommodation type",
-      "children_policy": {
-        "children_welcome": true,
-        "children_charged_as_adults_age": 13,
-        "cribs_available": false,
-        "extra_bed": {
-          "available": true,
-          "on_request": true,
-          "price_per_person_per_night_INR": 1500,
-          "subject_to_availability": true,
-          "included_in_total_price": false
-        }
-      },
-      "age_restriction": {
-        "minimum_check_in_age": 18,
-        "under_18_with_guardian": true
-      },
-      "pets": {
-        "allowed": false
-      },
-      "smoking": {
-        "allowed": false,
-        "designated_smoking_area": true
-      },
-      "couples": {
-        "unmarried_couples_allowed": true,
-        "couple_friendly": true
-      },
-      "id_requirements": {
-        "government_id_required": true,
-        "local_id_allowed": true,
-        "foreigners_allowed": true
-      },
-      "visitors": {
-        "allowed": true
-      },
-      "outside_food_beverage": {
-        "allowed": true
-      },
-      "parties_events": {
-        "allowed": false,
-        "note": "No bachelor/bachelorette or similar parties"
-      },
-      "groups": {
-        "note": "When booking more than 6 rooms, different policies and additional supplements may apply"
-      },
-      "special_deals_packages": {
-        "available": true,
-        "note": "Can be found on website or by speaking with reservation team"
+        "until": "4"
       }
-    },
-    "payment_methods": [
-      "American Express",
-      "Visa",
-      "Mastercard",
-      "JCB",
-      "Maestro",
-      "Discover",
-      "UnionPay",
-      "Credit Card",
-      "Debit Card",
-      "Cash"
-    ],
-    "nearby_places": [
-      {
-        "name": "Hwarang Thai Spa - Best Thai Spa in Indiranagar",
-        "distance_km": 0.44
-      },
-      {
-        "name": "Dogloo Water Tank",
-        "distance_km": 0.54
-      },
-      {
-        "name": "Rapid Cabs India Pvt Ltd",
-        "distance_km": 0.58
-      },
-      {
-        "name": "MAD MEN",
-        "distance_km": 0.69
-      },
-      {
-        "name": "Defence Colony Children's Park",
-        "distance_km": 0.77
-      },
-      {
-        "name": "Shri Krishna Swamy Temple",
-        "distance_km": 1.16
-      },
-      {
-        "name": "Shri Chokkanatha Swamy Temple",
-        "distance_km": 1.26
-      }
-    ],
-    "area_info": {
-      "guests_enjoyed_area_for": [
-        "Food and drinks",
-        "Shopping",
-        "Entertainment and nightlife"
-      ],
-      "top_attractions": [
-        {
-          "name": "The Heritage Centre & Aerospace Museum",
-          "distance_km": 4.7
-        },
-        {
-          "name": "Bangalore Aquarium",
-          "distance_km": 5
-        },
-        {
-          "name": "Visvesvaraya Industrial and Technological Museum",
-          "distance_km": 6
-        },
-        {
-          "name": "Cubbon Park",
-          "distance_km": 6
-        },
-        {
-          "name": "Indira Gandhi Musical Fountain Park",
-          "distance_km": 7
-        },
-        {
-          "name": "National Gallery of Modern Art",
-          "distance_km": 7
-        },
-        {
-          "name": "Freedom Park",
-          "distance_km": 8
-        },
-        {
-          "name": "Bangalore Palace",
-          "distance_km": 8
-        },
-        {
-          "name": "Lal Bagh Botanical Garden",
-          "distance_km": 8
-        },
-        {
-          "name": "Tipu Sultan's Summer Palace",
-          "distance_km": 9
-        }
-      ],
-      "restaurants_and_cafes": [
-        {
-          "name": "Chianti",
-          "type": "Restaurant",
-          "distance_m": 200
-        },
-        {
-          "name": "Bombay Brasserie",
-          "type": "Restaurant",
-          "distance_m": 300
-        },
-        {
-          "name": "Glocal Junction Indiranagar",
-          "type": "Cafe/Bar",
-          "distance_m": 300
-        }
-      ],
-      "natural_beauty": [
-        {
-          "name": "Ulsoor Lake",
-          "type": "Lake",
-          "distance_km": 4.9
-        },
-        {
-          "name": "Makkalokoota Park",
-          "type": "Waterfall",
-          "distance_km": 9
-        }
-      ],
-      "public_transit": [
-        {
-          "name": "Indiranagar",
-          "type": "Subway",
-          "distance_km": 1.7
-        },
-        {
-          "name": "Swami Vivekananda Road",
-          "type": "Subway",
-          "distance_km": 2.4
-        },
-        {
-          "name": "Baiyyappanahalli Junction",
-          "type": "Train",
-          "distance_km": 3.3
-        },
-        {
-          "name": "Shivajinagar Bus Station",
-          "type": "Bus",
-          "distance_km": 5
-        },
-        {
-          "name": "Banaswadi",
-          "type": "Train",
-          "distance_km": 6
-        },
-        {
-          "name": "Kempegowda Bus Terminal",
-          "type": "Bus",
-          "distance_km": 9
-        }
-      ],
-      "closest_airports": [
-        {
-          "name": "Kempegowda International Airport",
-          "distance_km": 33
-        }
-      ]
-    },
-    "guest_reviews": [
-      {
-        "reviewer": "S",
-        "country": "India",
-        "room_type": "Deluxe Queen Room",
-        "stay_duration": "6 nights",
-        "stay_month": "March 2026",
-        "traveler_type": "Couple",
-        "review_date": "2026-03-23",
-        "rating": 9.0,
-        "rating_label": "Excellent",
-        "positive": "Clean, aesthetic and comfortable",
-        "negative": null,
-        "hotel_response": "Dear Guest, Thank you for your kind words! We're delighted to hear that you found the hotel clean, aesthetic, and comfortable. We look forward to welcoming you again soon. Kind regards, Team Wandr."
-      },
-      {
-        "reviewer": "Peter",
-        "country": "United Kingdom",
-        "room_type": "Queen Room with Balcony",
-        "stay_duration": "2 nights",
-        "stay_month": "March 2026",
-        "traveler_type": "Couple",
-        "review_date": "2026-03-19",
-        "rating": 9.0,
-        "rating_label": "Wonderful",
-        "positive": "Fantastic location. Comfortable beds, plenty of storage.",
-        "negative": "Going home",
-        "hotel_response": "Dear Guest, Thank you for your wonderful review. We look forward to welcoming you again for another memorable stay. Thanks and Regards, Team Wandr."
-      },
-      {
-        "reviewer": "Balan",
-        "country": "India",
-        "room_type": "Deluxe Queen Room",
-        "stay_duration": "2 nights",
-        "stay_month": "February 2026",
-        "traveler_type": "Group",
-        "review_date": "2026-03-03",
-        "rating": 9.0,
-        "rating_label": "Stay was good. Location very close to my work area. Overall satisfied",
-        "positive": "Good",
-        "negative": "Not much",
-        "hotel_response": "Dear Mr. Balan, Thank you for sharing your valuable feedback. We are pleased to know that you had a good stay and that our location was convenient for your work. We look forward to welcoming you again."
-      },
-      {
-        "reviewer": "Sanjay",
-        "country": "India",
-        "room_type": "Deluxe Queen Room",
-        "stay_duration": "1 night",
-        "stay_month": "March 2026",
-        "traveler_type": "Group",
-        "review_date": "2026-03-02",
-        "rating": 8.0,
-        "rating_label": "Very Good",
-        "positive": "Location is very good. Just in 5 min you get to 12th main which has all the restaurants and bars. 100 feet road is 10 min away by walk.",
-        "negative": "Never seen such small 'Deluxe' bedroom.",
-        "hotel_response": "Dear Mr. Sanjay, We regret that the deluxe room size did not meet your expectations. Your feedback is important to us. We look forward to welcoming you again."
-      },
-      {
-        "reviewer": "Tatiana",
-        "country": "Austria",
-        "room_type": "Deluxe Queen Room",
-        "stay_duration": "5 nights",
-        "stay_month": "February 2026",
-        "traveler_type": "Solo traveler",
-        "review_date": "2026-02-28",
-        "rating": 8.0,
-        "rating_label": "Very Good",
-        "positive": "The staff was very friendly and the location is fantastic. On a quiet spot, but close to all the nice places of Indiranagar.",
-        "negative": "The water bottles were very small and I would have appreciated a way to fill my water bottle without generating so much garbage.",
-        "hotel_response": "Thank you for your valuable feedback Ms. Tatiana. We will look into more sustainable solutions. We look forward to welcoming you again soon."
-      }
-    ],
-    "faqs": [
-      {
-        "question": "What kind of breakfast is served at Wandr Indiranagar, Bangalore?",
-        "answer": "Guests can enjoy a highly-rated breakfast. Options include Continental, Vegetarian, Asian, American, Buffet, and À la carte."
-      },
-      {
-        "question": "What type of room can I book at Wandr Indiranagar, Bangalore?",
-        "answer": "Room options include Double, Twin, standard rooms, deluxe rooms, suites, and family rooms."
-      },
-      {
-        "question": "How much does it cost to stay at Wandr Indiranagar, Bangalore?",
-        "answer": "Prices vary depending on stay dates and hotel policy. Enter your dates to see current prices."
-      },
-      {
-        "question": "How far is Wandr Indiranagar, Bangalore from the center of Bangalore?",
-        "answer": "4.7 km from the center of Bangalore."
-      },
-      {
-        "question": "Is Wandr Indiranagar, Bangalore popular with families?",
-        "answer": "Yes, it is popular with guests booking family stays."
-      },
-      {
-        "question": "What are the check-in and check-out times?",
-        "answer": "Check-in from 13:00 (1:00 PM), check-out until 11:00 AM."
-      },
-      {
-        "question": "Do they serve breakfast?",
-        "answer": "Select your dates, then view the list of available rooms to see if breakfast options are available."
-      },
-      {
-        "question": "Is there an airport shuttle service?",
-        "answer": "Yes, airport shuttle is available for an additional fee. Request it directly after booking."
-      },
-      {
-        "question": "Is there a restaurant?",
-        "answer": "Yes, there is a restaurant on-site that serves breakfast, lunch, and dinner."
-      },
-      {
-        "question": "Can I park there?",
-        "answer": "Free private parking is available on site. Reservation is not needed. At least two cars can be parked inside the property."
-      },
-      {
-        "question": "Are there rooms with a private bathroom?",
-        "answer": "Yes, rooms with a private bathroom are available. Select your dates to confirm availability."
-      },
-      {
-        "question": "Is there a swimming pool?",
-        "answer": "No, Wandr Indiranagar, Bangalore does not have a swimming pool."
-      },
-      {
-        "question": "Is there a fitness center?",
-        "answer": "No, there is no pool or fitness center on site."
-      },
-      {
-        "question": "Are there rooms with a balcony?",
-        "answer": "Yes, rooms with a balcony are available. Select your dates to confirm availability."
-      },
-      {
-        "question": "What's the Wi-Fi policy?",
-        "answer": "WiFi is available in all areas and is free of charge."
-      },
-      {
-        "question": "Are you couple friendly?",
-        "answer": "Yes, all guests are welcome as long as they have valid ID cards. Unmarried couples are allowed."
-      },
-      {
-        "question": "Do you allow early check-in or late check-out?",
-        "answer": "Subject to availability, early check-in and late check-out can be accommodated at additional cost. If rooms are unavailable, guests are welcome to use the common areas."
-      },
-      {
-        "question": "Are there any special deals or packages available?",
-        "answer": "Yes, special deals and packages can be found on the website or by speaking with the reservation team."
-      },
-      {
-        "question": "Are pets allowed?",
-        "answer": "No, pets are not allowed."
-      }
-    ],
-    "fine_print": [
-      "Please inform Wandr Indiranagar, Bangalore of your expected arrival time in advance.",
-      "This property does not accommodate bachelor(ette) or similar parties.",
-      "Guests under the age of 18 can only check in with a parent or official guardian.",
-      "Outside food and beverages are allowed.",
-      "Local IDs are accepted.",
-      "Foreigners are allowed.",
-      "Visitors are allowed."
-    ],
-    "contact": {
-      "phone": "Not available — please check wandrhotels.com",
-      "email": "Not available — please check wandrhotels.com",
-      "website": "wandrhotels.com",
-      "address_full": "3363 No. 3363, 2nd cross road, HAL 2nd stage, Indiranagar, Bangalore - 560038, Karnataka, India"
-    },
-    "property_master": 
-    {
-      "property_type": "Boutique Hotel",
-      "year_opened": 2025,
-      "last_renovated": 2025,
-      "number_of_floors": 2,
-      "total_rooms": 18,
-      "geo_coordinates": {
-        "latitude": 12.9734,
-        "longitude": 77.6412
-      },
-      "google_maps_url": "https://maps.app.goo.gl/MhG3LfojHpw1Hyj1A?g_st=aw",
-      "landmarks": [
-        "Indiranagar 100 Feet Road",
-        "Indiranagar Metro Station",
-        "Indiranagar Methodist Church",
-        "Toit Brewery"
-      ],
-      "power_backup": true,
-      "ev_charging": false,
-      "valet_parking": false
-    },
-    "location_intelligence": {
-      "nearest_hospital": [
-        "Axon Speciality Hospital (6th Main Road)",
-        "Chinmaya Mission Hospital (CMH Road)",
-        "Manipal Hospital (Old Airport Road)",
-        "Lohitha Hospital (16th E Main Road)"
-      ],
-      "nearest_pharmacy": [
-      "S.S Medicals (12th Main Road)",
-      "Apollo Pharmacy (18th Main Road)",
-      "Revive Pharma 24/7 (Paramahansa Yogananda Road)",
-      "Prakash Medicals (80 Feet Road)"
-      ],
-      "nearest_atm": [
-        "HDFC Bank ATM (100 Feet Road)",
-        "ICICI Bank ATM (12th Main Road)",
-        "State Bank of India ATM (CMH Road)",
-        "Axis Bank ATM (HAL 2nd Stage)"
-      ],
-      "nearest_grocery_store": [
-        "Ratnadeep Supermarket (12th Main Road)",
-        "Simpli Namdhari's (7th Cross Road)",
-        "MK Retail Supermarket (CMH Road)",
-        "Organic Mandya (9th A Main Road)"
-      ],
-      "nearest_petrol_bunk": [
-        "Indian Oil Corporation Junction (Old Airport Rd)",
-        "HP Fuel Station (Indiranagar 100 Feet Rd)",
-        "Bharat Petroleum (Domlur Flyover Lounge)",
-        "Shell Fuel Station (Old Madras Road)"
-      ],
-      "nearest_police_station": [
-        "Indiranagar Traffic Police Station",
-        "Indiranagar Law & Order Police Station",
-        "Jeevan Bima Nagar Police Station",
-        "Domlur Police Outpost"
-      ],
-      "safe_at_night": [
-        "Highly secure due to active nightlife",
-        "Regular police patrol vehicles passing by",
-        "Bright streetlights across commercial roads",
-        "Active street crowd presence until midnight"
-      ],
-      "noise_level": [
-        "Low inside individual hotel rooms",
-        "Medium on secondary neighborhood roads",
-        "High near main party pubs on weekends",
-        "Low during standard morning hours"
-      ],
-      "cab_accessibility": [
-        "Immediate Uber and Ola driver matching",
-        "Rapido bike taxi pickups under two minutes",
-        "Namma Yatri auto rickshaws easily available",
-        "Ample space for roadside vehicle boarding"
-      ],
-      "traffic_level": [
-        "Low during early morning hours",
-        "Moderate during standard afternoon hours",
-        "High during corporate peak office checkout times",
-        "Heavy congestion near 100 Feet Road intersections"
-      ],
-      "railway_station_distance_km": [
-        "7.8 km to KSR Bengaluru City Station",
-        "6.2 km to Cantonment Railway Station",
-        "5.5 km to Krishnarajapuram Railway Station",
-        "11.5 km to Yesvantpur Junction Station"
-      ],
-      "airport_travel_time_minutes": [
-        "65 minutes using a standard taxi route",
-        "50 minutes during early morning hours",
-        "90 minutes during heavy evening traffic blocks",
-        "75 minutes riding the KIA-76 Volvo airport bus"
-      ]
-    },
-    "room_specs": {
-      "room_size_sqft": {
-        "deluxe_twin_room": 205,
-        "deluxe_queen_room": 215,
-        "deluxe_double_room": 237,
-        "queen_room_with_balcony": 258,
-        "twin_room_with_balcony": 258
-      },
-      "bed_dimensions": {
-        "queen_bed": "60 x 78 inches",
-        "single_bed": "36 x 75 inches"
-      },
-      "mattress_type": "Hypoallergenic Bedding",
-      "hot_water_availability": "24-hour hot & cold water",
-      "blackout_curtains": true,
-      "charging_ports_per_room": "Multiple bedside and desk sockets",
-      "workspace_friendly": true,
-      "smart_tv": true
-    },
-    "digital_experience": {
-      "mobile_check_in": true,
-      "digital_check_out": true,
-      "online_kyc": true,
-      "whatsapp_concierge": true,
-      "digital_room_key": null,
-      "qr_room_service": true,
-      "wifi_speed_mbps": 100,
-      "backup_internet_provider": "Airtel Fiber"
-    },
-    "food_and_dining_details": {
-      "breakfast_timings": "08:00 AM - 10:30 AM",
-      "breakfast_type": "South Indian Veg & Non-Veg (Sourced outside/Buffet/À la carte)",
-      "room_service_timings": "24 Hours",
-      "late_night_food_available": true,
-      "jain_food_available": null,
-      "vegan_food_available": null,
-      "gluten_free_options": null,
-      "kids_meals_available": null,
-      "complimentary_tea_coffee": true,
-      "outside_delivery_apps_allowed": true
-    },
-    "cleaning_hygiene": {
-      "room_cleaning_frequency": "Daily",
-      "linen_change_frequency": "On request / Alternate days",
-      "sanitization_process": "Standard hospitality deep cleaning protocol between guest stays",
-      "eco_friendly_toiletries": null,
-      "ro_drinking_water": true
-    },
-    "safety_emergency": {
-      "doctor_on_call": true,
-      "first_aid_kit_available": true,
-      "fire_exit_map_in_rooms": true,
-      "emergency_contact_process": "24/7 front desk helpline via WhatsApp and intercom",
-      "female_traveler_safety_rating": "Excellent"
-    },
-    "billing_details": {
-      "upi_accepted": true,
-      "security_deposit": null,
-      "refund_timeline_days": 7,
-      "split_payment_supported": true,
-      "corporate_billing_available": true,
-      "gst_breakdown": {
-        "cgst_percentage": 6.0,
-        "sgst_percentage": 6.0,
-        "total_gst_percentage": 12.0
-      }
-    },
-    "booking_operations": {
-      "walk_in_guests_allowed": true,
-      "tentative_booking_available": false,
-      "tentative_booking_hold_duration": null,
-      "booking_modification_policy": "Modifications allowed subject to rate differences and room availability per platform rules",
-      "no_show_policy": "Attracts full cost of the scheduled stay or full first-night penalty charge"
-    },
-    "guest_personalization": {
-      "loyalty_program": null,
-      "reward_points_supported": null,
-      "returning_guest_discount": null,
-      "room_upgrade_policy": "Subject to availability upon arrival, typically applicable during low-occupancy windows",
-      "saved_guest_preferences": null
-    },
-    "event_services": {
-      "birthday_decorations": "Allowed via third-party vendors (In-house staff setups not provided)",
-      "anniversary_setup": "Allowed via third-party vendors (In-house staff setups not provided)",
-      "honeymoon_setup": null,
-      "cake_arrangement": "Can be arranged externally via Swiggy/Zomato delivery apps",
-      "flower_bouquet_arrangement": null,
-      "private_dining": null,
-      "local_tours_arranged": null
-    },
-    "business_traveler_features": {
-      "printing_service": "Available at the front reception desk on request",
-      "scanning_service": "Available at the front reception desk on request",
-      "coworking_space": null,
-      "meeting_room_available": null,
-      "weekly_rates_available": "Subject to custom seasonal corporate quotes via team outreach",
-      "monthly_stay_discount": "Subject to custom seasonal corporate quotes via team outreach"
-    },
-    "ai_metadata": {
-      "faq_intents": [
-        "ask_total_floors",
-        "ask_property_type",
-        "ask_year_opened",
-        "ask_location_coordinates",
-        "ask_nearest_hospital",
-        "ask_wifi_speed",
-        "ask_outside_food_policy",
-        "ask_third_party_decoration"
-      ],
-      "search_keywords": [
-        "Wandr Indiranagar Bangalore",
-        "Boutique hotel near 100 Feet Road",
-        "Wandr Hotels Bengaluru booking",
-        "Budget corporate stay Indiranagar",
-        "Hotels near Indiranagar Metro Station",
-        "Wandr Indiranagar balcony rooms"
-      ],
-      "review_topics": [
-        "Room cleanliness and modern decor",
-        "Proximity to Indiranagar pubs and cafes",
-        "High-speed Wi-Fi performance for work",
-        "Helpful reception and front desk staff",
-        "Outside food delivery convenience",
-        "Quietness inside residential cross-lanes"
-      ],
-      "semantic_tags": [
-        "hospitality:hotel:boutique",
-        "geo:india:bengaluru:indiranagar",
-        "traveler:corporate:solo",
-        "amenity:workspace_friendly",
-        "policy:outside_food_allowed",
-        "infrastructure:low_rise"
-      ]
     }
   }
 }
