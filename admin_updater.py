@@ -1,17 +1,18 @@
 # ============================================================
 #  admin_updater.py  —  Updates wandr_indiranagar.json on GitHub
+#  + triggers Render redeploy automatically
 # ============================================================
 
 import os
 import json
 import base64
 import requests
-from datetime import datetime
 
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
-GITHUB_REPO  = os.environ.get("GITHUB_REPO", "")
-FILE_PATH    = "wandr_indiranagar.json"
-API_URL      = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{FILE_PATH}"
+GITHUB_TOKEN       = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO        = os.environ.get("GITHUB_REPO", "")
+RENDER_DEPLOY_HOOK = os.environ.get("RENDER_DEPLOY_HOOK", "")
+FILE_PATH          = "wandr_indiranagar.json"
+API_URL            = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{FILE_PATH}"
 
 HEADERS = {
     "Authorization": f"token {GITHUB_TOKEN}",
@@ -19,8 +20,16 @@ HEADERS = {
 }
 
 
+def _trigger_redeploy():
+    if RENDER_DEPLOY_HOOK:
+        try:
+            requests.get(RENDER_DEPLOY_HOOK, timeout=5)
+            print("[Render] Redeploy triggered")
+        except Exception as e:
+            print(f"[Render] Redeploy failed: {e}")
+
+
 def _fetch_current_json():
-    """Fetch current JSON file from GitHub."""
     r = requests.get(API_URL, headers=HEADERS)
     r.raise_for_status()
     data    = r.json()
@@ -30,16 +39,12 @@ def _fetch_current_json():
 
 
 def _push_updated_json(hotel_data: dict, sha: str, message: str):
-    """Push updated JSON back to GitHub."""
     content = json.dumps({"hotel": hotel_data}, indent=2, ensure_ascii=False)
     encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
-    payload = {
-        "message": message,
-        "content": encoded,
-        "sha": sha
-    }
+    payload = {"message": message, "content": encoded, "sha": sha}
     r = requests.put(API_URL, headers=HEADERS, json=payload)
     r.raise_for_status()
+    _trigger_redeploy()
     return True
 
 
@@ -58,7 +63,7 @@ def update_room_price(room_type: str, plan: str, new_price: int):
                 if pricing["plan"].lower() == plan.lower():
                     pricing["price_per_night_INR"] = new_price
                     _push_updated_json(hotel, sha, f"Admin: Updated price for {room_type}")
-                    return f"Price updated to ₹{new_price} for {room_type} ({plan})"
+                    return f"Price updated to Rs.{new_price} for {room_type} ({plan})"
     return "Room type or plan not found."
 
 
@@ -107,8 +112,12 @@ def update_checkin_time(checkin: str, checkout: str):
     hotel, sha = _fetch_current_json()
     if "house_rules" not in hotel:
         hotel["house_rules"] = {}
-    hotel["house_rules"]["check_in"]  = {"from": checkin}
-    hotel["house_rules"]["check_out"] = {"until": checkout}
+    if "check_in" not in hotel["house_rules"]:
+        hotel["house_rules"]["check_in"] = {}
+    if "check_out" not in hotel["house_rules"]:
+        hotel["house_rules"]["check_out"] = {}
+    hotel["house_rules"]["check_in"]["from"]   = checkin
+    hotel["house_rules"]["check_out"]["until"] = checkout
     _push_updated_json(hotel, sha, "Admin: Updated check-in/check-out times")
     return f"Check-in updated to {checkin}, Check-out updated to {checkout}"
 
