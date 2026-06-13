@@ -1,6 +1,5 @@
 # ============================================================
 #  admin_updater.py  —  Updates wandr_indiranagar.json on GitHub
-#  + triggers Render redeploy automatically
 # ============================================================
 
 import os
@@ -30,18 +29,27 @@ def _trigger_redeploy():
 
 
 def _fetch_current_json():
+    """Returns (hotel_data, sha) — hotel_data is the inner hotel object only."""
     r = requests.get(API_URL, headers=HEADERS)
     r.raise_for_status()
-    data    = r.json()
-    content = base64.b64decode(data["content"]).decode("utf-8")
-    sha     = data["sha"]
-    return json.loads(content), sha
+    data       = r.json()
+    content    = base64.b64decode(data["content"]).decode("utf-8")
+    sha        = data["sha"]
+    full       = json.loads(content)
+    # Always extract the inner hotel object
+    hotel_data = full["hotel"]
+    # Guard against double nesting
+    if "hotel" in hotel_data and isinstance(hotel_data["hotel"], dict):
+        hotel_data = hotel_data["hotel"]
+    return hotel_data, sha
 
 
 def _push_updated_json(hotel_data: dict, sha: str, message: str):
-    content = json.dumps({"hotel": hotel_data}, indent=2, ensure_ascii=False)
-    encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
-    payload = {"message": message, "content": encoded, "sha": sha}
+    """Always saves as {"hotel": hotel_data} — never double-nested."""
+    full_data = {"hotel": hotel_data}
+    content   = json.dumps(full_data, indent=2, ensure_ascii=False)
+    encoded   = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+    payload   = {"message": message, "content": encoded, "sha": sha}
     r = requests.put(API_URL, headers=HEADERS, json=payload)
     r.raise_for_status()
     _trigger_redeploy()
@@ -50,6 +58,8 @@ def _push_updated_json(hotel_data: dict, sha: str, message: str):
 
 def add_faq(question: str, answer: str):
     hotel, sha = _fetch_current_json()
+    if "faqs" not in hotel:
+        hotel["faqs"] = []
     hotel["faqs"].append({"question": question, "answer": answer})
     _push_updated_json(hotel, sha, f"Admin: Added FAQ - {question[:50]}")
     return "FAQ added successfully!"
@@ -104,7 +114,7 @@ def add_policy(policy_text: str):
     if "fine_print" not in hotel:
         hotel["fine_print"] = []
     hotel["fine_print"].append(policy_text)
-    _push_updated_json(hotel, sha, f"Admin: Added policy")
+    _push_updated_json(hotel, sha, "Admin: Added policy")
     return "Policy added successfully!"
 
 
