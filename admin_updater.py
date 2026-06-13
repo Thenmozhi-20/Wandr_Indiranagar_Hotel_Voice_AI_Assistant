@@ -1,0 +1,120 @@
+# ============================================================
+#  admin_updater.py  —  Updates wandr_indiranagar.json on GitHub
+# ============================================================
+
+import os
+import json
+import base64
+import requests
+from datetime import datetime
+
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO  = os.environ.get("GITHUB_REPO", "")
+FILE_PATH    = "wandr_indiranagar.json"
+API_URL      = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{FILE_PATH}"
+
+HEADERS = {
+    "Authorization": f"token {GITHUB_TOKEN}",
+    "Accept": "application/vnd.github.v3+json"
+}
+
+
+def _fetch_current_json():
+    """Fetch current JSON file from GitHub."""
+    r = requests.get(API_URL, headers=HEADERS)
+    r.raise_for_status()
+    data    = r.json()
+    content = base64.b64decode(data["content"]).decode("utf-8")
+    sha     = data["sha"]
+    return json.loads(content), sha
+
+
+def _push_updated_json(hotel_data: dict, sha: str, message: str):
+    """Push updated JSON back to GitHub."""
+    content = json.dumps({"hotel": hotel_data}, indent=2, ensure_ascii=False)
+    encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+    payload = {
+        "message": message,
+        "content": encoded,
+        "sha": sha
+    }
+    r = requests.put(API_URL, headers=HEADERS, json=payload)
+    r.raise_for_status()
+    return True
+
+
+def add_faq(question: str, answer: str):
+    hotel, sha = _fetch_current_json()
+    hotel["faqs"].append({"question": question, "answer": answer})
+    _push_updated_json(hotel, sha, f"Admin: Added FAQ - {question[:50]}")
+    return "FAQ added successfully!"
+
+
+def update_room_price(room_type: str, plan: str, new_price: int):
+    hotel, sha = _fetch_current_json()
+    for room in hotel["rooms"]:
+        if room["room_type"].lower() == room_type.lower():
+            for pricing in room["pricing"]:
+                if pricing["plan"].lower() == plan.lower():
+                    pricing["price_per_night_INR"] = new_price
+                    _push_updated_json(hotel, sha, f"Admin: Updated price for {room_type}")
+                    return f"Price updated to ₹{new_price} for {room_type} ({plan})"
+    return "Room type or plan not found."
+
+
+def update_room_availability(room_type: str, status: str):
+    hotel, sha = _fetch_current_json()
+    for room in hotel["rooms"]:
+        if room["room_type"].lower() == room_type.lower():
+            room["availability_status"] = status
+            _push_updated_json(hotel, sha, f"Admin: Updated availability for {room_type}")
+            return f"Availability updated to '{status}' for {room_type}"
+    return "Room type not found."
+
+
+def add_nearby_place(name: str, distance_km: float, category: str):
+    hotel, sha = _fetch_current_json()
+    if "nearby_places" not in hotel:
+        hotel["nearby_places"] = []
+    hotel["nearby_places"].append({
+        "name": name,
+        "distance_km": distance_km,
+        "category": category
+    })
+    _push_updated_json(hotel, sha, f"Admin: Added nearby place - {name}")
+    return f"Nearby place '{name}' added successfully!"
+
+
+def update_food_info(field: str, value: str):
+    hotel, sha = _fetch_current_json()
+    if "food_and_dining_details" not in hotel:
+        hotel["food_and_dining_details"] = {}
+    hotel["food_and_dining_details"][field] = value
+    _push_updated_json(hotel, sha, f"Admin: Updated food info - {field}")
+    return f"Food info updated: {field} = {value}"
+
+
+def add_policy(policy_text: str):
+    hotel, sha = _fetch_current_json()
+    if "fine_print" not in hotel:
+        hotel["fine_print"] = []
+    hotel["fine_print"].append(policy_text)
+    _push_updated_json(hotel, sha, f"Admin: Added policy")
+    return "Policy added successfully!"
+
+
+def update_checkin_time(checkin: str, checkout: str):
+    hotel, sha = _fetch_current_json()
+    if "house_rules" not in hotel:
+        hotel["house_rules"] = {}
+    hotel["house_rules"]["check_in"]  = {"from": checkin}
+    hotel["house_rules"]["check_out"] = {"until": checkout}
+    _push_updated_json(hotel, sha, "Admin: Updated check-in/check-out times")
+    return f"Check-in updated to {checkin}, Check-out updated to {checkout}"
+
+
+def update_general_info(field: str, value: str):
+    hotel, sha = _fetch_current_json()
+    hotel[field] = value
+    _push_updated_json(hotel, sha, f"Admin: Updated {field}")
+    return f"Updated {field} successfully!"

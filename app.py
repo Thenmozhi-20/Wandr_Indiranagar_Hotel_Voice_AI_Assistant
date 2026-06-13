@@ -5,6 +5,7 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import base64
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -15,9 +16,14 @@ from speech_to_text import convert_from_base64
 from response_generator import get_ai_response, reset_conversation
 from text_to_speech import generate_audio_bytes
 from sheets_logger import log_chat
+from admin_updater import (
+    add_faq, update_room_price, update_room_availability,
+    add_nearby_place, update_food_info, add_policy, update_checkin_time
+)
 from config import FLASK_SECRET_KEY
 
 app.secret_key = FLASK_SECRET_KEY
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "wandr@admin")
 
 print("=" * 50)
 print("  🏨 Wandr Indiranagar — Voice Assistant")
@@ -30,6 +36,46 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/admin")
+def admin():
+    return render_template("admin.html")
+
+
+@app.route("/admin/login", methods=["POST"])
+def admin_login():
+    data = request.get_json()
+    if data.get("password") == ADMIN_PASSWORD:
+        return jsonify({"success": True})
+    return jsonify({"success": False})
+
+
+@app.route("/admin/update", methods=["POST"])
+def admin_update():
+    data   = request.get_json()
+    action = data.get("action")
+    try:
+        if action == "add_faq":
+            msg = add_faq(data["question"], data["answer"])
+        elif action == "update_room_price":
+            msg = update_room_price(data["room_type"], data["plan"], data["new_price"])
+        elif action == "update_room_availability":
+            msg = update_room_availability(data["room_type"], data["status"])
+        elif action == "update_food":
+            msg = update_food_info(data["field"], data["value"])
+        elif action == "add_nearby":
+            msg = add_nearby_place(data["name"], data["distance"], data["category"])
+        elif action == "add_policy":
+            msg = add_policy(data["policy"])
+        elif action == "update_checkin":
+            msg = update_checkin_time(data["checkin"], data["checkout"])
+        else:
+            return jsonify({"success": False, "error": "Unknown action"})
+        return jsonify({"success": True, "message": msg})
+    except Exception as e:
+        print(f"[Admin Error] {e}")
+        return jsonify({"success": False, "error": str(e)})
+
+
 @app.route("/ask/text", methods=["POST"])
 def ask_text():
     data      = request.get_json()
@@ -40,10 +86,7 @@ def ask_text():
     reply       = get_ai_response(user_text)
     audio_bytes = generate_audio_bytes(reply)
     audio_b64   = base64.b64encode(audio_bytes).decode("utf-8") if audio_bytes else None
-
-    # ── Log to Google Sheets ──────────────────────────────────
     log_chat(user_text, reply)
-
     return jsonify({"reply": reply, "audio": audio_b64})
 
 
@@ -64,15 +107,10 @@ def ask_voice():
             "audio": None
         })
 
-    reply = get_ai_response(user_text)
-    print(f"[Voice] Reply: {reply}")
-
+    reply       = get_ai_response(user_text)
     audio_bytes = generate_audio_bytes(reply)
     audio_out   = base64.b64encode(audio_bytes).decode("utf-8") if audio_bytes else None
-
-    # ── Log to Google Sheets ──────────────────────────────────
     log_chat(user_text, reply)
-
     return jsonify({"transcript": user_text, "reply": reply, "audio": audio_out})
 
 
