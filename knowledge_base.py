@@ -10,10 +10,19 @@ import re
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 _JSON_PATH = os.path.join(_BASE_DIR, "wandr_indiranagar.json")
 
-with open(_JSON_PATH, "r", encoding="utf-8") as f:
-    _HOTEL = json.load(f)["hotel"]
+def _load():
+    with open(_JSON_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)["hotel"]
 
-print(f"[KB] Loaded hotel data: {_HOTEL['name']}")
+_HOTEL = _load()
+print(f"[KB] Loaded hotel data: {_HOTEL.get('name', 'Wandr')}")
+
+def _reload():
+    """Called by admin routes after adding/deleting a requirement."""
+    global _HOTEL
+    _HOTEL = _load()
+    count = len(_HOTEL.get("custom_requirements", []))
+    print(f"[KB] Reloaded: {count} custom requirement(s)")
 
 # ── Synonym map ───────────────────────────────────────────────
 SYNONYMS = {
@@ -391,6 +400,16 @@ def _section_business() -> str:
         f"Workspace-friendly rooms: Yes"
     )
 
+# ── Custom requirements (added via admin panel) ───────────────
+def _section_custom_requirements() -> str:
+    reqs = _HOTEL.get("custom_requirements", [])
+    if not reqs:
+        return ""
+    lines = ["SPECIAL HOTEL REQUIREMENTS & UPDATES:"]
+    for r in reqs:
+        lines.append(f"[{r.get('category','General')}] {r.get('title','')}: {r.get('text','')}")
+    return "\n".join(lines)
+
 # ── Intent → section mapping ──────────────────────────────────
 INTENT_SECTIONS = {
     "fitness_center":     [_section_fitness_pool],
@@ -449,5 +468,10 @@ def get_relevant_context(query: str, top_k: int = 3) -> str:
             context_parts.append(fn())
         except Exception as e:
             print(f"[KB] Section error in {fn.__name__}: {e}")
+
+    # Always append custom requirements if any exist
+    custom = _section_custom_requirements()
+    if custom:
+        context_parts.append(custom)
 
     return "\n\n".join(context_parts)
