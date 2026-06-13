@@ -891,7 +891,8 @@
       "gluten_free_options": null,
       "kids_meals_available": null,
       "complimentary_tea_coffee": true,
-      "outside_delivery_apps_allowed": true
+      "outside_delivery_apps_allowed": true,
+      "dinner_timings": "4:00 AM - 5:30 AM"
     },
     "cleaning_hygiene": {
       "room_cleaning_frequency": "Daily",
