@@ -10,19 +10,10 @@ import re
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 _JSON_PATH = os.path.join(_BASE_DIR, "wandr_indiranagar.json")
 
-def _load():
-    with open(_JSON_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)["hotel"]
+with open(_JSON_PATH, "r", encoding="utf-8") as f:
+    _HOTEL = json.load(f)["hotel"]
 
-_HOTEL = _load()
-print(f"[KB] Loaded hotel data: {_HOTEL.get('name', 'Wandr')}")
-
-def _reload():
-    """Called by admin routes after adding/deleting a requirement."""
-    global _HOTEL
-    _HOTEL = _load()
-    count = len(_HOTEL.get("custom_requirements", []))
-    print(f"[KB] Reloaded: {count} custom requirement(s)")
+print(f"[KB] Loaded hotel data: {_HOTEL['name']}")
 
 # ── Synonym map ───────────────────────────────────────────────
 SYNONYMS = {
@@ -160,8 +151,8 @@ def _section_checkin() -> str:
     dig = _HOTEL.get("digital_experience", {})
     return (
         f"CHECK-IN / CHECK-OUT:\n"
-        f"Check-in: from {ci.get('from', '13:00')} (1:00 PM)\n"
-        f"Check-out: until {co.get('until', '11:00')} (11:00 AM)\n"
+        f"Check-in: from {ci.get('from', '13:00')}\n"
+        f"Check-out: until {co.get('until', '11:00')}\n"
         f"Early check-in: {ci.get('early_check_in', 'Subject to availability at additional cost')}\n"
         f"Late check-out: {co.get('late_check_out', 'Subject to availability')}\n"
         f"Note: {ci.get('note', 'Advance notice of arrival time required')}\n"
@@ -400,16 +391,6 @@ def _section_business() -> str:
         f"Workspace-friendly rooms: Yes"
     )
 
-# ── Custom requirements (added via admin panel) ───────────────
-def _section_custom_requirements() -> str:
-    reqs = _HOTEL.get("custom_requirements", [])
-    if not reqs:
-        return ""
-    lines = ["SPECIAL HOTEL REQUIREMENTS & UPDATES:"]
-    for r in reqs:
-        lines.append(f"[{r.get('category','General')}] {r.get('title','')}: {r.get('text','')}")
-    return "\n".join(lines)
-
 # ── Intent → section mapping ──────────────────────────────────
 INTENT_SECTIONS = {
     "fitness_center":     [_section_fitness_pool],
@@ -468,10 +449,5 @@ def get_relevant_context(query: str, top_k: int = 3) -> str:
             context_parts.append(fn())
         except Exception as e:
             print(f"[KB] Section error in {fn.__name__}: {e}")
-
-    # Always append custom requirements if any exist
-    custom = _section_custom_requirements()
-    if custom:
-        context_parts.append(custom)
 
     return "\n\n".join(context_parts)
