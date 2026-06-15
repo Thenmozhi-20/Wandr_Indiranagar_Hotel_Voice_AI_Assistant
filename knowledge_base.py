@@ -62,6 +62,18 @@ SYNONYMS = {
     "first aid": "safety", "doctor": "safety", "emergency": "safety",
     "celebrate": "events", "birthday": "events", "anniversary": "events",
     "honeymoon": "events", "decoration": "events",
+    "contact": "contact", "phone": "contact", "email": "contact",
+    "call": "contact", "reach": "contact", "number": "contact",
+    "amenities": "amenities", "facilities available": "amenities",
+    "what do you offer": "amenities", "features": "amenities",
+    "review": "reviews", "rating": "reviews", "feedback": "reviews",
+    "guest review": "reviews", "what do guests say": "reviews",
+    "walk in": "booking_ops", "no show": "booking_ops",
+    "modify booking": "booking_ops", "change booking": "booking_ops",
+    "attraction": "area_info", "places to visit": "area_info",
+    "tourist": "area_info", "sightseeing": "area_info",
+    "upgrade": "personalization", "loyalty": "personalization",
+    "returning guest": "personalization", "discount": "personalization",
     "business": "business", "meeting": "business", "print": "business",
     "couple": "policies", "unmarried": "policies", "pets allowed": "pets",
 }
@@ -171,7 +183,9 @@ def _section_food() -> str:
     return (
         f"FOOD & DINING:\n"
         f"Restaurant on-site: Yes (serves breakfast, lunch, and dinner)\n"
-        f"Breakfast timings: {fd.get('breakfast_timings', '08:00 AM - 10:30 AM')}\n"
+        f"Breakfast timings: {fd.get('breakfast_timings', 'Morning')}\n"
+        f"Lunch timings: {fd.get('lunch_timings', 'Afternoon')}\n"
+        f"Dinner timings: {fd.get('dinner_timings', 'Evening')}\n"
         f"Breakfast type: {fd.get('breakfast_type', 'South Indian Veg & Non-Veg')}\n"
         f"Breakfast options: {', '.join(bf.get('options', []))}\n"
         f"Room service: {fd.get('room_service_timings', '24 Hours')}\n"
@@ -391,6 +405,85 @@ def _section_business() -> str:
         f"Workspace-friendly rooms: Yes"
     )
 
+
+def _section_contact() -> str:
+    c = _HOTEL.get("contact", {})
+    return (
+        f"CONTACT INFO:\n"
+        f"Phone: {c.get('phone', 'Please check wandrhotels.com')}\n"
+        f"Email: {c.get('email', 'Please check wandrhotels.com')}\n"
+        f"Website: {c.get('website', 'wandrhotels.com')}\n"
+        f"Full Address: {c.get('address_full', _HOTEL['address']['street'])}"
+    )
+
+
+def _section_amenities() -> str:
+    amenities = _HOTEL.get("amenities", [])
+    return (
+        f"AMENITIES:\n"
+        f"All amenities: {', '.join(amenities) if amenities else 'WiFi, Parking, Elevator, Restaurant, 24h Front Desk'}"
+    )
+
+
+def _section_description() -> str:
+    d = _HOTEL.get("description", {})
+    return (
+        f"HOTEL DESCRIPTION:\n"
+        f"{d.get('comfortable_accommodations', '')}\n"
+        f"{d.get('essential_facilities', '')}\n"
+        f"{d.get('dining_options', '')}"
+    )
+
+
+def _section_reviews() -> str:
+    reviews = _HOTEL.get("guest_reviews", [])
+    r = _HOTEL.get("ratings", {})
+    if not reviews:
+        return f"GUEST REVIEWS:\nOverall rating: {r.get('overall_score', 'N/A')}/10"
+    lines = [f"GUEST REVIEWS (Overall: {r.get('overall_score', 'N/A')}/10 — {r.get('overall_label', '')})"]
+    for rv in reviews[:3]:
+        pos = rv.get('positive', '')
+        neg = rv.get('negative', '')
+        if pos:
+            lines.append(f"- {rv.get('reviewer','Guest')} ({rv.get('traveler_type','')}, {rv.get('stay_month','')}): '{pos}'")
+    return "\n".join(lines)
+
+
+def _section_booking_ops() -> str:
+    b = _HOTEL.get("booking_operations", {})
+    return (
+        f"BOOKING OPERATIONS:\n"
+        f"Walk-in guests: {'Yes' if b.get('walk_in_guests_allowed') else 'No'}\n"
+        f"Booking modification: {b.get('booking_modification_policy', 'Subject to availability')}\n"
+        f"No-show policy: {b.get('no_show_policy', 'Full night charge applies')}"
+    )
+
+
+def _section_area_info() -> str:
+    a = _HOTEL.get("area_info", {})
+    attractions = a.get("top_attractions", [])
+    enjoyed = a.get("guests_enjoyed_area_for", [])
+    top = [f"{x['name']} ({x['distance_km']} km)" for x in attractions[:5]]
+    dist_city = _HOTEL.get("distance_from_city_center_km", "4.7")
+    dist_airport = _HOTEL.get("distance_from_airport_km", "33")
+    return (
+        f"AREA INFO:\n"
+        f"Distance from city center: {dist_city} km\n"
+        f"Distance from airport: {dist_airport} km\n"
+        f"Guests enjoy area for: {', '.join(enjoyed)}\n"
+        f"Top attractions nearby: {', '.join(top)}"
+    )
+
+
+def _section_guest_personalization() -> str:
+    g = _HOTEL.get("guest_personalization", {})
+    return (
+        f"GUEST PERSONALIZATION:\n"
+        f"Room upgrade: {g.get('room_upgrade_policy', 'Subject to availability upon arrival')}\n"
+        f"Loyalty program: {'Yes' if g.get('loyalty_program') else 'Not available'}\n"
+        f"Returning guest discount: {'Yes' if g.get('returning_guest_discount') else 'Not available'}"
+    )
+
 # ── Intent → section mapping ──────────────────────────────────
 INTENT_SECTIONS = {
     "fitness_center":     [_section_fitness_pool],
@@ -415,6 +508,13 @@ INTENT_SECTIONS = {
     "events":             [_section_events],
     "business":           [_section_business],
     "policies":           [_section_policies, _section_checkin],
+    "contact":            [_section_contact],
+    "amenities":          [_section_amenities],
+    "description":        [_section_description],
+    "reviews":            [_section_reviews],
+    "booking_ops":        [_section_booking_ops],
+    "area_info":          [_section_area_info],
+    "personalization":    [_section_guest_personalization],
 }
 
 # ── Core retrieval function ───────────────────────────────────
