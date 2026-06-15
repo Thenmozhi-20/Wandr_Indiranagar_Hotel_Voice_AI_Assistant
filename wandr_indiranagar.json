@@ -375,12 +375,12 @@
     },
     "house_rules": {
       "check_in": {
-        "from": "5",
+        "from": "13",
         "early_check_in": "Subject to availability, at additional cost",
         "note": "Advance notice of arrival time required"
       },
       "check_out": {
-        "until": "17",
+        "until": "11",
         "late_check_out": "Subject to availability"
       },
       "cancellation_prepayment": "Varies according to accommodation type",
