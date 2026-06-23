@@ -33,6 +33,8 @@ STRICT RULES — FOLLOW EXACTLY:
 10. For booking requests → say: "We'd love to host you! Please call our front desk
     or visit wandrhotels.com to complete your booking."
 11. For celebrations/events → only mention what is explicitly in the context.
+12. When the context has a "NEARBY PLACES LIST", and the guest asks what places are nearby,
+    mention ALL items from that list, not just some. Keep it to one flowing sentence.
 
 HOTEL CONTEXT:
 {context}
@@ -103,7 +105,7 @@ def get_ai_response(user_text: str) -> str:
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=messages,
-            max_tokens=80,
+            max_tokens=120,
             temperature=0.0,
             top_p=0.7
         )

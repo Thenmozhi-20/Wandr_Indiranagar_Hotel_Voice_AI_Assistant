@@ -244,6 +244,18 @@ def _section_location() -> str:
         f"Cab access: {li.get('cab_accessibility', ['Uber and Ola available'])[0]}"
     )
 
+def _section_nearby_places_list() -> str:
+    """Dedicated section for ONLY the nearby_places list (admin manageable)."""
+    nearby = _HOTEL.get("nearby_places", [])
+    if not isinstance(nearby, list) or not nearby:
+        return "NEARBY PLACES LIST:\nNo additional nearby places listed."
+    lines = ["NEARBY PLACES LIST (use ALL of these, do not skip any):"]
+    for p in nearby:
+        dist = p.get("distance_km", "")
+        lines.append(f"- {p.get('name', '')} ({dist} km away)")
+    return "\n".join(lines)
+
+
 def _section_nearby() -> str:
     li = _HOTEL.get("location_intelligence", {})
     nearby = _HOTEL.get("nearby_places", [])
@@ -496,7 +508,7 @@ INTENT_SECTIONS = {
     "rooms":              [_section_rooms],
     "pricing":            [_section_pricing, _section_rooms],
     "location":           [_section_location],
-    "nearby":             [_section_nearby, _section_location],
+    "nearby":             [_section_nearby_places_list, _section_nearby],
     "nearby_restaurants": [_section_nearby_restaurants, _section_nearby],
     "transport":          [_section_transport, _section_location],
     "safety":             [_section_safety],
