@@ -732,6 +732,10 @@
       {
         "question": "Are pets allowed?",
         "answer": "No, pets are not allowed."
+      },
+      {
+        "question": "do you have a swimming pool with slides",
+        "answer": "No, we don't have a swimming pool at this property."
       }
     ],
     "fine_print": [
