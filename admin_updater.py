@@ -139,7 +139,7 @@ def update_general_info(field: str, value: str):
     return f"Updated {field} successfully!"
 
 
-# ── TASK 2: DELETE DATA ───────────────────────────────────────
+# ── DELETE DATA ────────────────────────────────────────────────
 
 def get_current_data():
     """Returns FAQs, nearby places, and policies — for the admin delete UI."""
@@ -152,7 +152,6 @@ def get_current_data():
 
 
 def delete_faq(index: int):
-    """Delete a FAQ by its index in the faqs list."""
     hotel, sha = _fetch_current_json()
     faqs = hotel.get("faqs", [])
     if index < 0 or index >= len(faqs):
@@ -164,7 +163,6 @@ def delete_faq(index: int):
 
 
 def delete_nearby_place(index: int):
-    """Delete a nearby place by its index in the nearby_places list."""
     hotel, sha = _fetch_current_json()
     places = hotel.get("nearby_places", [])
     if index < 0 or index >= len(places):
@@ -176,7 +174,6 @@ def delete_nearby_place(index: int):
 
 
 def delete_policy(index: int):
-    """Delete a policy/fine_print entry by its index."""
     hotel, sha = _fetch_current_json()
     policies = hotel.get("fine_print", [])
     if index < 0 or index >= len(policies):

@@ -15,7 +15,7 @@ print("⏳ Starting Wandr Hotels Assistant...")
 from speech_to_text import convert_from_base64
 from response_generator import get_ai_response, reset_conversation
 from text_to_speech import generate_audio_bytes
-from sheets_logger import log_chat
+from sheets_logger import log_chat, get_unanswered_summary
 from admin_updater import (
     add_faq, update_room_price, update_room_availability,
     add_nearby_place, update_food_info, add_policy, update_checkin_time,
@@ -58,6 +58,17 @@ def admin_data():
         return jsonify({"success": True, "data": data})
     except Exception as e:
         print(f"[Admin Data Error] {e}")
+        return jsonify({"success": False, "error": str(e)})
+
+
+@app.route("/admin/unanswered", methods=["GET"])
+def admin_unanswered():
+    """Returns questions Maya couldn't answer, grouped by frequency."""
+    try:
+        summary = get_unanswered_summary()
+        return jsonify({"success": True, "data": summary})
+    except Exception as e:
+        print(f"[Admin Unanswered Error] {e}")
         return jsonify({"success": False, "error": str(e)})
 
 

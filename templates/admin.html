@@ -212,6 +212,44 @@
     }
     .manage-delete-btn:hover { opacity: 0.85; }
     .manage-empty { color: #6b7a9f; font-size: 13px; font-style: italic; }
+
+    .unanswered-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #0f1535;
+      border: 1px solid #2a3575;
+      border-left: 3px solid #e24b4a;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+    }
+    .unanswered-text { flex: 1; }
+    .unanswered-question { color: #e8effe; font-size: 14px; font-weight: 600; }
+    .unanswered-meta { color: #6b7a9f; font-size: 12px; margin-top: 4px; }
+    .unanswered-count {
+      background: #e24b4a;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+    .unanswered-addbtn {
+      background: #f5c842;
+      color: #1a1f3c;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .unanswered-addbtn:hover { opacity: 0.85; }
   </style>
 </head>
 <body>
@@ -245,6 +283,7 @@
     <div class="tab" data-tab="policies" onclick="showTab('policies')">📋 Policies</div>
     <div class="tab" data-tab="checkin" onclick="showTab('checkin')">🕐 Timings</div>
     <div class="tab" data-tab="manage" onclick="showTab('manage')">🗑 Manage / Delete</div>
+    <div class="tab" data-tab="unanswered" onclick="showTab('unanswered')">❗ Unanswered</div>
   </div>
 
   <!-- FAQ -->
@@ -425,6 +464,17 @@
     </div>
   </div>
 
+  <!-- Unanswered Questions Dashboard -->
+  <div class="section" id="section-unanswered">
+    <div class="card">
+      <h3>❗ Unanswered Questions Dashboard</h3>
+      <div class="note">⚠️ These are real guest questions Maya could NOT answer, sorted by how often they were asked. Add the most frequent ones as FAQs to improve Maya.</div>
+      <button class="btn btn-primary" onclick="loadUnanswered()" style="margin-bottom:16px">🔄 Refresh Dashboard</button>
+      <div id="unanswered-status" style="font-size:13px; color:#6b7a9f; margin-bottom:12px;"></div>
+      <div id="unanswered-list"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -465,6 +515,7 @@
     document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
     document.getElementById("section-" + name).classList.add("active");
     if (name === "manage") loadManageData();
+    if (name === "unanswered") loadUnanswered();
   }
 
   // ── Submit ─────────────────────────────────────────────────
@@ -588,13 +639,59 @@
       const data = await res.json();
       if (data.success) {
         document.getElementById("manage-status").textContent = "✅ " + data.message;
-        loadManageData(); // refresh the list
+        loadManageData();
       } else {
         document.getElementById("manage-status").textContent = "❌ Error: " + data.error;
       }
     } catch (e) {
       document.getElementById("manage-status").textContent = "❌ Network error. Try again.";
     }
+  }
+
+  // ── Unanswered Questions Dashboard ──────────────────────────
+  async function loadUnanswered() {
+    const statusEl = document.getElementById("unanswered-status");
+    const listEl   = document.getElementById("unanswered-list");
+    statusEl.textContent = "⏳ Loading unanswered questions...";
+    listEl.innerHTML = "";
+
+    try {
+      const res  = await fetch("/admin/unanswered");
+      const data = await res.json();
+      if (!data.success) {
+        statusEl.textContent = "❌ Error: " + data.error;
+        return;
+      }
+      const items = data.data;
+      if (!items || items.length === 0) {
+        statusEl.textContent = "";
+        listEl.innerHTML = `<div class="manage-empty">🎉 No unanswered questions! Maya is answering everything guests ask.</div>`;
+        return;
+      }
+      statusEl.textContent = `Showing ${items.length} unique question(s) Maya could not answer, sorted by frequency.`;
+      let html = "";
+      items.forEach((item) => {
+        const safeQuestion = item.question.replace(/'/g, "\\'");
+        html += `
+          <div class="unanswered-item">
+            <div class="unanswered-text">
+              <div class="unanswered-question">${item.question}</div>
+              <div class="unanswered-meta">Last asked: ${item.last_asked || 'N/A'}</div>
+            </div>
+            <span class="unanswered-count">${item.count}×</span>
+            <button class="unanswered-addbtn" onclick="prefillFaqFromUnanswered('${safeQuestion}')">➕ Add as FAQ</button>
+          </div>`;
+      });
+      listEl.innerHTML = html;
+    } catch (e) {
+      statusEl.textContent = "❌ Network error loading dashboard.";
+    }
+  }
+
+  function prefillFaqFromUnanswered(question) {
+    showTab('faq');
+    document.getElementById("faq-question").value = question;
+    document.getElementById("faq-answer").focus();
   }
 
   function showResult(id, msg, status) {
