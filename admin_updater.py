@@ -137,3 +137,51 @@ def update_general_info(field: str, value: str):
     hotel[field] = value
     _push_updated_json(hotel, sha, f"Admin: Updated {field}")
     return f"Updated {field} successfully!"
+
+
+# ── TASK 2: DELETE DATA ───────────────────────────────────────
+
+def get_current_data():
+    """Returns FAQs, nearby places, and policies — for the admin delete UI."""
+    hotel, sha = _fetch_current_json()
+    return {
+        "faqs":          hotel.get("faqs", []),
+        "nearby_places": hotel.get("nearby_places", []),
+        "policies":      hotel.get("fine_print", [])
+    }
+
+
+def delete_faq(index: int):
+    """Delete a FAQ by its index in the faqs list."""
+    hotel, sha = _fetch_current_json()
+    faqs = hotel.get("faqs", [])
+    if index < 0 or index >= len(faqs):
+        return "Invalid FAQ selected."
+    deleted = faqs.pop(index)
+    hotel["faqs"] = faqs
+    _push_updated_json(hotel, sha, f"Admin: Deleted FAQ - {deleted.get('question','')[:50]}")
+    return f"Deleted FAQ: '{deleted.get('question','')[:60]}'"
+
+
+def delete_nearby_place(index: int):
+    """Delete a nearby place by its index in the nearby_places list."""
+    hotel, sha = _fetch_current_json()
+    places = hotel.get("nearby_places", [])
+    if index < 0 or index >= len(places):
+        return "Invalid place selected."
+    deleted = places.pop(index)
+    hotel["nearby_places"] = places
+    _push_updated_json(hotel, sha, f"Admin: Deleted nearby place - {deleted.get('name','')}")
+    return f"Deleted nearby place: '{deleted.get('name','')}'"
+
+
+def delete_policy(index: int):
+    """Delete a policy/fine_print entry by its index."""
+    hotel, sha = _fetch_current_json()
+    policies = hotel.get("fine_print", [])
+    if index < 0 or index >= len(policies):
+        return "Invalid policy selected."
+    deleted = policies.pop(index)
+    hotel["fine_print"] = policies
+    _push_updated_json(hotel, sha, "Admin: Deleted policy")
+    return f"Deleted policy: '{deleted[:60]}'"

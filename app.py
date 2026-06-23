@@ -18,7 +18,8 @@ from text_to_speech import generate_audio_bytes
 from sheets_logger import log_chat
 from admin_updater import (
     add_faq, update_room_price, update_room_availability,
-    add_nearby_place, update_food_info, add_policy, update_checkin_time
+    add_nearby_place, update_food_info, add_policy, update_checkin_time,
+    delete_faq, delete_nearby_place, delete_policy, get_current_data
 )
 from config import FLASK_SECRET_KEY
 
@@ -49,6 +50,17 @@ def admin_login():
     return jsonify({"success": False})
 
 
+@app.route("/admin/data", methods=["GET"])
+def admin_data():
+    """Returns current FAQs, nearby places, and policies for the delete UI."""
+    try:
+        data = get_current_data()
+        return jsonify({"success": True, "data": data})
+    except Exception as e:
+        print(f"[Admin Data Error] {e}")
+        return jsonify({"success": False, "error": str(e)})
+
+
 @app.route("/admin/update", methods=["POST"])
 def admin_update():
     data   = request.get_json()
@@ -68,6 +80,12 @@ def admin_update():
             msg = add_policy(data["policy"])
         elif action == "update_checkin":
             msg = update_checkin_time(data["checkin"], data["checkout"])
+        elif action == "delete_faq":
+            msg = delete_faq(int(data["index"]))
+        elif action == "delete_nearby":
+            msg = delete_nearby_place(int(data["index"]))
+        elif action == "delete_policy":
+            msg = delete_policy(int(data["index"]))
         else:
             return jsonify({"success": False, "error": "Unknown action"})
         return jsonify({"success": True, "message": msg})
