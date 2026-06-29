@@ -732,6 +732,10 @@
       {
         "question": "do you have a swimming pool with slides",
         "answer": "No, we don't have a swimming pool at this property."
+      },
+      {
+        "question": "do you have a swimming pool with slides",
+        "answer": "We do not have a swimming pool at this property."
       }
     ],
     "fine_print": [
