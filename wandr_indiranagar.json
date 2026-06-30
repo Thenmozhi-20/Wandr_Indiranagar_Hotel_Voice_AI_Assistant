@@ -744,6 +744,10 @@
       {
         "question": "do you have a karaoke room",
         "answer": "No, we don't have a karaoke room at this property."
+      },
+      {
+        "question": "do you have a helipad for guests",
+        "answer": "No, we do not have a helipad at this property."
       }
     ],
     "fine_print": [
