@@ -496,6 +496,20 @@ def _section_guest_personalization() -> str:
         f"Returning guest discount: {'Yes' if g.get('returning_guest_discount') else 'Not available'}"
     )
 
+
+def _section_faqs() -> str:
+    """All admin-added FAQs — always included so new FAQs work regardless of keyword matching."""
+    faqs = _HOTEL.get("faqs", [])
+    if not faqs:
+        return ""
+    lines = ["FREQUENTLY ASKED QUESTIONS (use these directly if the guest's question matches):"]
+    for item in faqs:
+        q = item.get("question", "").strip()
+        a = item.get("answer", "").strip()
+        if q and a:
+            lines.append(f"- Q: {q}\n  A: {a}")
+    return "\n".join(lines)
+
 # ── Intent → section mapping ──────────────────────────────────
 INTENT_SECTIONS = {
     "fitness_center":     [_section_fitness_pool],
@@ -561,5 +575,13 @@ def get_relevant_context(query: str, top_k: int = 3) -> str:
             context_parts.append(fn())
         except Exception as e:
             print(f"[KB] Section error in {fn.__name__}: {e}")
+
+    # ── Always include FAQs — these are free-form Q&A and shouldn't rely on keyword matching ──
+    try:
+        faq_text = _section_faqs()
+        if faq_text:
+            context_parts.append(faq_text)
+    except Exception as e:
+        print(f"[KB] Section error in _section_faqs: {e}")
 
     return "\n\n".join(context_parts)
