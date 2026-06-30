@@ -15,7 +15,7 @@ print("⏳ Starting Wandr Hotels Assistant...")
 from speech_to_text import convert_from_base64
 from response_generator import get_ai_response, reset_conversation
 from text_to_speech import generate_audio_bytes
-from sheets_logger import log_chat, get_unanswered_summary
+from sheets_logger import log_chat, get_unanswered_summary, resolve_unanswered
 from admin_updater import (
     add_faq, update_room_price, update_room_availability,
     add_nearby_place, update_food_info, add_policy, update_checkin_time,
@@ -79,6 +79,10 @@ def admin_update():
     try:
         if action == "add_faq":
             msg = add_faq(data["question"], data["answer"])
+            # ── If this FAQ resolves a previously unanswered question, remove it ──
+            source_question = data.get("source_unanswered_question")
+            if source_question:
+                resolve_unanswered(source_question)
         elif action == "update_room_price":
             msg = update_room_price(data["room_type"], data["plan"], data["new_price"])
         elif action == "update_room_availability":

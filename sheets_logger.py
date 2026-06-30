@@ -56,8 +56,8 @@ def _get_unanswered_sheet():
         try:
             _unanswered_sheet = spreadsheet.worksheet("Unanswered")
         except gspread.WorksheetNotFound:
-            _unanswered_sheet = spreadsheet.add_worksheet(title="Unanswered", rows=1000, cols=3)
-            _unanswered_sheet.append_row(["Timestamp", "Question", "Mode"])
+            _unanswered_sheet = spreadsheet.add_worksheet(title="Unanswered", rows=1000, cols=2)
+            _unanswered_sheet.append_row(["Timestamp", "Question"])
             print("[Sheets] Created 'Unanswered' tab")
         return _unanswered_sheet
     except Exception as e:
@@ -76,13 +76,13 @@ def log_chat(question: str, reply: str):
     except Exception as e:
         print(f"[Sheets Log Error] {e}")
 
-    # ── Flag unanswered questions separately ───────────────────
+    # ── Flag unanswered questions separately (no Mode column) ──
     try:
         if FALLBACK_MESSAGE.lower() in reply.lower():
             unanswered = _get_unanswered_sheet()
             if unanswered is not None:
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                unanswered.append_row([timestamp, question, "text"])
+                unanswered.append_row([timestamp, question])
                 print(f"[Sheets] Flagged unanswered: {question[:50]}")
     except Exception as e:
         print(f"[Sheets Unanswered Error] {e}")
@@ -94,7 +94,7 @@ def get_unanswered_summary(limit: int = 50):
         sheet = _get_unanswered_sheet()
         if sheet is None:
             return []
-        rows = sheet.get_all_records()  # [{Timestamp, Question, Mode}, ...]
+        rows = sheet.get_all_records()  # [{Timestamp, Question}, ...]
         if not rows:
             return []
 
@@ -125,3 +125,33 @@ def get_unanswered_summary(limit: int = 50):
     except Exception as e:
         print(f"[Sheets Summary Error] {e}")
         return []
+
+
+def resolve_unanswered(question: str):
+    """
+    Removes ALL rows from the Unanswered tab whose Question matches (case-insensitive).
+    Called automatically when that question is answered via a new FAQ.
+    """
+    try:
+        sheet = _get_unanswered_sheet()
+        if sheet is None:
+            return False
+        all_values = sheet.get_all_values()  # includes header row at index 0
+        if len(all_values) <= 1:
+            return False
+
+        target = question.strip().lower()
+        rows_to_delete = []
+        for i, row in enumerate(all_values[1:], start=2):  # sheet rows are 1-indexed; row 1 is header
+            if len(row) > 1 and row[1].strip().lower() == target:
+                rows_to_delete.append(i)
+
+        for row_index in sorted(rows_to_delete, reverse=True):
+            sheet.delete_rows(row_index)
+
+        if rows_to_delete:
+            print(f"[Sheets] Resolved and removed {len(rows_to_delete)} unanswered row(s) for: {question[:50]}")
+        return len(rows_to_delete) > 0
+    except Exception as e:
+        print(f"[Sheets Resolve Error] {e}")
+        return False
