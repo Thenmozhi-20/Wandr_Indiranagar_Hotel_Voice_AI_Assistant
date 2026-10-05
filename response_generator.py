@@ -103,11 +103,11 @@ def get_ai_response(user_text: str) -> str:
 
         # Call Groq
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
             messages=messages,
-            max_tokens=120,
+            max_tokens=400,
             temperature=0.0,
-            top_p=0.7
+            reasoning_effort="low"
         )
 
         reply = response.choices[0].message.content.strip()
