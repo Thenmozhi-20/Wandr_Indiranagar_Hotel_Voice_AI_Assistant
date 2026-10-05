@@ -183,9 +183,9 @@ def _section_food() -> str:
     return (
         f"FOOD & DINING:\n"
         f"Restaurant on-site: Yes (serves breakfast, lunch, and dinner)\n"
-        f"Breakfast timings: {fd.get('breakfast_timings', 'Not available - please contact front desk')}\n"
-        f"Lunch timings: {fd.get('lunch_timings', 'Not available - please contact front desk')}\n"
-        f"Dinner timings: {fd.get('dinner_timings', 'Not available - please contact front desk')}\n"
+        f"Breakfast timings: {fd.get('breakfast_timings', 'Morning')}\n"
+        f"Lunch timings: {fd.get('lunch_timings', 'Afternoon')}\n"
+        f"Dinner timings: {fd.get('dinner_timings', 'Evening')}\n"
         f"Breakfast type: {fd.get('breakfast_type', 'South Indian Veg & Non-Veg')}\n"
         f"Breakfast options: {', '.join(bf.get('options', []))}\n"
         f"Room service: {fd.get('room_service_timings', '24 Hours')}\n"
@@ -506,9 +506,6 @@ def _section_faqs() -> str:
     for item in faqs:
         q = item.get("question", "").strip()
         a = item.get("answer", "").strip()
-        # Generic price FAQ confuses the AI - real prices come from the rooms data
-        if "prices vary" in a.lower() or "enter your dates" in a.lower():
-            continue
         if q and a:
             lines.append(f"- Q: {q}\n  A: {a}")
     return "\n".join(lines)
@@ -551,10 +548,10 @@ def get_relevant_context(query: str, top_k: int = 3) -> str:
     q = query.lower()
     q = re.sub(r"[^\w\s]", " ", q)
 
-    matched_intents = []
+    matched_intents = set()
     for keyword, intent in SYNONYMS.items():
-        if keyword in q and intent not in matched_intents:
-            matched_intents.append(intent)
+        if keyword in q:
+            matched_intents.add(intent)
 
     builders = []
     seen = set()
@@ -588,131 +585,3 @@ def get_relevant_context(query: str, top_k: int = 3) -> str:
         print(f"[KB] Section error in _section_faqs: {e}")
 
     return "\n\n".join(context_parts)
-
-
-# ============================================================
-#  DIRECT ANSWERS  —  read straight from the JSON (no AI needed)
-#  These are always correct because Python reads the data itself.
-# ============================================================
-
-def _join(items):
-    items = [str(i) for i in items]
-    if len(items) <= 2:
-        return " and ".join(items)
-    return ", ".join(items[:-1]) + ", and " + items[-1]
-
-
-def _words(text: str) -> set:
-    return set(re.sub(r"[^\w\s]", " ", text.lower()).split())
-
-
-def get_room_types_answer() -> str:
-    avail, sold = [], []
-    for r in _HOTEL.get("rooms", []):
-        status = r.get("availability_status", "").lower()
-        (sold if "sold out" in status else avail).append(r["room_type"])
-    reply = f"We have {_join(avail + sold)}."
-    if sold:
-        reply += f" Currently sold out: {_join(sold)}."
-    return reply
-
-
-_PRICE_WORDS = ["cost", "price", "how much", "rate", "tariff", "charge"]
-_FOLLOWUP_WORDS = {"tomorrow", "today", "tonight", "weekend", "date", "dates", "week",
-                   "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}
-_NOT_ROOM_PRICE = {"service", "laundry", "parking", "food", "wifi", "early", "late",
-                   "extra", "pet", "cab", "taxi", "airport"}
-
-
-def _room_keywords(name: str) -> set:
-    return set(name.lower().split()) - {"room", "with"}
-
-
-def _room_price_text(room: dict):
-    pricing = room.get("pricing", [])
-    if not pricing:
-        return None
-    parts = []
-    for p in pricing:
-        plan = "with breakfast" if "breakfast" in p.get("plan", "").lower() else "room only"
-        parts.append(f"{int(p['price_per_night_INR']):,} rupees {plan}")
-    return " or ".join(parts)
-
-
-def get_price_answer(user_text: str, prev_text: str = ""):
-    """Room price answer straight from JSON, or None if this is not a room-price question."""
-    q = user_text.lower()
-    words = _words(q)
-
-    # Short follow-ups such as "tomorrow" reuse the previous price question
-    if len(words) <= 4 and words & _FOLLOWUP_WORDS and prev_text:
-        q = prev_text.lower() + " " + q
-        words = _words(q)
-
-    if not any(w in q for w in _PRICE_WORDS):
-        return None
-
-    rooms = _HOTEL.get("rooms", [])
-    matched = [r for r in rooms if _room_keywords(r["room_type"]).issubset(words)]
-    if not matched:
-        matched = [r for r in rooms if _room_keywords(r["room_type"]) & words]
-    if not matched:
-        if (("room" in words or "rooms" in words or "stay" in words or "night" in words)
-                and not (words & _NOT_ROOM_PRICE)):
-            matched = rooms
-        else:
-            return None
-
-    priced, sold = [], []
-    for r in matched:
-        text = _room_price_text(r)
-        (priced if text else sold).append((r, text))
-
-    reply_parts = []
-    if len(priced) == 1:
-        r, text = priced[0]
-        reply_parts.append(f"The {r['room_type']} is {text} per night, plus taxes, for 2 guests.")
-    elif len(priced) > 1:
-        body = "; ".join(f"{r['room_type']} is {t}" for r, t in priced)
-        reply_parts.append(f"Per night, plus taxes, for 2 guests: {body}.")
-    if sold:
-        names = _join([r['room_type'] for r, _ in sold])
-        reply_parts.append(f"The {names} {'is' if len(sold) == 1 else 'are'} currently sold out.")
-    if priced:
-        reply_parts.append("For exact dates, please check wandrhotels.com.")
-        limited = [r["room_type"] for r, _ in priced
-                   if "limited" in r.get("availability_status", "").lower()]
-        if limited:
-            reply_parts.append(f"Note: {_join(limited)} has limited rooms left.")
-    return " ".join(reply_parts)
-
-
-def get_direct_answer(text: str):
-    """Common structured questions answered straight from the JSON. None if no match."""
-    q   = re.sub(r"[^\w\s]", " ", text.lower())
-    li  = _HOTEL.get("location_intelligence", {})
-    has = lambda *w: any(x in q for x in w)
-
-    if has("payment", "pay by", "accept card", "credit card", "debit card", "upi"):
-        methods = _HOTEL.get("payment_methods", [])
-        cards = [m for m in methods if m not in ("Credit Card", "Debit Card", "Cash")]
-        return f"We accept credit and debit cards ({_join(cards)}) and cash."
-
-    if has("police"):
-        return "The nearest police stations are " + _join(li.get("nearest_police_station", [])[:3]) + "."
-    if has("railway", "train station"):
-        stations = [s.replace(" to ", " away: ", 1) if " to " in s else s
-                    for s in li.get("railway_station_distance_km", [])[:3]]
-        return "The nearest railway stations are " + _join(stations) + "."
-    if has("hospital"):
-        return "The nearest hospitals are " + _join(li.get("nearest_hospital", [])[:3]) + "."
-    if has("pharmacy", "medical shop", "medicals", "chemist"):
-        return "The nearest pharmacies are " + _join(li.get("nearest_pharmacy", [])[:3]) + "."
-    if has("atm"):
-        return "The nearest ATMs are " + _join(li.get("nearest_atm", [])[:3]) + "."
-
-    if has("facilities", "amenities") and not has("room"):
-        return ("We offer free WiFi, free parking, an on-site restaurant and cafe with breakfast buffet, "
-                "an elevator, a 24-hour lobby, security with cameras, daily housekeeping, laundry, "
-                "and a coffee machine. The hotel is wheelchair friendly and couple friendly.")
-    return None
