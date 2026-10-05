@@ -748,6 +748,10 @@
       {
         "question": "do you have a helipad for guests",
         "answer": "No, we do not have a helipad at this property."
+      },
+      {
+        "question": "How many people can stay in the Deluxe Queen Room?",
+        "answer": "The Deluxe Queen Room accommodates 2 guests."
       }
     ],
     "fine_print": [
