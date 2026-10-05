@@ -701,8 +701,10 @@ def get_direct_answer(text: str):
     if has("police"):
         return "The nearest police stations are " + _join(li.get("nearest_police_station", [])[:3]) + "."
     if has("railway", "train station"):
-        stations = [s.replace(" to ", " away: ", 1) if " to " in s else s
-                    for s in li.get("railway_station_distance_km", [])[:3]]
+        stations = []
+        for s in li.get("railway_station_distance_km", [])[:3]:
+            m = re.match(r"^([\d.]+)\s*km to (.+)$", s)
+            stations.append(f"{m.group(2)} ({m.group(1)} km)" if m else s)
         return "The nearest railway stations are " + _join(stations) + "."
     if has("hospital"):
         return "The nearest hospitals are " + _join(li.get("nearest_hospital", [])[:3]) + "."
