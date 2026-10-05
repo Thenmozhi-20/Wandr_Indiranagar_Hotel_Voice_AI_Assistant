@@ -4,7 +4,10 @@
 # ============================================================
 
 from groq import Groq
-from knowledge_base import get_relevant_context
+from knowledge_base import (
+    get_relevant_context, get_direct_answer,
+    get_price_answer, get_room_types_answer
+)
 from config import GROQ_API_KEY
 
 client = Groq(api_key=GROQ_API_KEY)
@@ -35,6 +38,10 @@ STRICT RULES — FOLLOW EXACTLY:
 11. For celebrations/events → only mention what is explicitly in the context.
 12. When the context has a "NEARBY PLACES LIST", and the guest asks what places are nearby,
     mention ALL items from that list, not just some. Keep it to one flowing sentence.
+13. For price questions, quote the exact rupee price from the ROOM TYPES or PRICING
+    section, with the plan (room only / with breakfast). Prices are plus taxes, for
+    2 guests. Rooms marked Sold Out cannot be booked. We cannot check prices for
+    specific dates; for that, say to visit wandrhotels.com.
 
 HOTEL CONTEXT:
 {context}
@@ -75,22 +82,45 @@ BOOKING_REPLY = (
 )
 
 
+def _remember(user_text: str, reply: str):
+    global chat_history
+    chat_history.append({"role": "user", "content": user_text})
+    chat_history.append({"role": "assistant", "content": reply})
+    chat_history = chat_history[-6:]
+
+
 def get_ai_response(user_text: str) -> str:
     global chat_history
     user_lower = user_text.lower()
+    prev_user  = next((m["content"] for m in reversed(chat_history)
+                       if m["role"] == "user"), "")
 
-    # ── Booking shortcut ──────────────────────────────────────
+    # 1. Facts answered straight from the JSON (police, payment, facilities...)
+    reply = get_direct_answer(user_text)
+    if reply:
+        _remember(user_text, reply)
+        return reply
+
+    # 2. Room price questions -> exact prices from the JSON
+    reply = get_price_answer(user_text, prev_user)
+    if reply:
+        _remember(user_text, reply)
+        return reply
+
+    # 3. Room type questions -> room list from the JSON
+    if any(t in user_lower for t in ROOM_TYPE_TRIGGERS):
+        reply = get_room_types_answer()
+        _remember(user_text, reply)
+        return reply
+
+    # 4. Plain booking request
     if any(t in user_lower for t in BOOKING_TRIGGERS):
-        chat_history.append({"role": "user", "content": user_text})
-        chat_history.append({"role": "assistant", "content": BOOKING_REPLY})
+        _remember(user_text, BOOKING_REPLY)
         return BOOKING_REPLY
 
+    # 5. Everything else -> AI using the retrieved context
     try:
-        # ── Force rooms context for room type questions ───────
-        if any(t in user_lower for t in ROOM_TYPE_TRIGGERS):
-            context = get_relevant_context("room types pricing", top_k=3)
-        else:
-            context = get_relevant_context(user_text, top_k=3)
+        context = get_relevant_context(f"{prev_user} {user_text}", top_k=3)
 
         # Build system prompt with context
         system = SYSTEM_PROMPT.format(context=context)
@@ -110,7 +140,9 @@ def get_ai_response(user_text: str) -> str:
             reasoning_effort="low"
         )
 
-        reply = response.choices[0].message.content.strip()
+        reply = (response.choices[0].message.content or "").strip()
+        if not reply:
+            reply = "I don't have that information — please contact our front desk directly."
 
         # Block hallucinated content
         if any(t in reply.lower() for t in HALLUCINATION_TRIGGERS):
@@ -118,15 +150,14 @@ def get_ai_response(user_text: str) -> str:
             reply = "I don't have that information — please contact our front desk directly."
 
         # Save to history
-        chat_history.append({"role": "user", "content": user_text})
-        chat_history.append({"role": "assistant", "content": reply})
-        if len(chat_history) > 6:
-            chat_history = chat_history[-6:]
+        _remember(user_text, reply)
 
         print(f"[Reply] {reply}")
         return reply
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"[Groq Error] {e}")
         return (
             "I'm having a little trouble right now. "
